@@ -6,7 +6,7 @@ import { useAuthStore } from './store/useAuthStore';
 import { AppShell } from './components/layout/AppShell';
 
 import CatalogPage   from './pages/CatalogPage';
-import LoginPage     from './pages/LoginPage';
+import LoginPage     from './pages/login/LoginPage';
 import DashboardPage from './pages/DashboardPage';
 import ProductsPage  from './pages/ProductsPage';
 import SalesPage     from './pages/SalesPage';

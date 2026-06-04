@@ -9,6 +9,7 @@ import { useAuthStore } from '../store/useAuthStore';
 import { supabase } from '../lib/supabase';
 import { Button, Badge, Modal, Select, Empty, Input, Textarea } from '../components/ui';
 import type { Sale, SaleStatus, Product } from '../types';
+import './SalesPage.css';
 
 const STATUS_COLOR: Record<SaleStatus, 'gray'|'blue'|'amber'|'purple'|'green'|'red'> = {
   pending: 'amber', confirmed: 'blue', printing: 'purple',
@@ -32,80 +33,63 @@ function SaleRow({ sale, onStatusChange }: { sale: Sale; onStatusChange: () => v
 
   return (
     <>
-      <tr
-        className="border-b border-border hover:bg-bg/50 transition-colors cursor-pointer"
-        onClick={() => setExpanded(!expanded)}
-      >
-        <td className="px-4 py-3">
-          <div>
-            <p className="font-medium text-fg text-sm">
-              {sale.customer?.name ?? 'Cliente directo'}
-            </p>
-            <p className="text-xs text-fg-muted">{sale.customer?.phone ?? '—'}</p>
-          </div>
+      <tr onClick={() => setExpanded(!expanded)}>
+        <td>
+          <p className="sale-customer">{sale.customer?.name ?? 'Cliente directo'}</p>
+          <p className="sale-phone">{sale.customer?.phone ?? '—'}</p>
         </td>
-        <td className="px-4 py-3 text-xs text-fg-muted">
+        <td style={{ fontSize: '.8rem', color: '#6b7280' }}>
           {new Date(sale.created_at).toLocaleDateString('es-CO')}
         </td>
-        <td className="px-4 py-3">
+        <td>
           <Badge color={STATUS_COLOR[sale.status]}>
             {saleService.getStatusLabel(sale.status)}
           </Badge>
         </td>
-        <td className="px-4 py-3 font-bold text-fg text-sm">
-          {fmt(sale.total_amount)}
-        </td>
-        <td className="px-4 py-3 text-fg-muted">
+        <td className="sale-total">{fmt(sale.total_amount)}</td>
+        <td className="sale-chevron">
           {expanded ? <ChevronUp size={16}/> : <ChevronDown size={16}/>}
         </td>
       </tr>
 
       {expanded && (
-        <tr className="bg-bg/30">
-          <td colSpan={5} className="px-4 py-3">
-            <div className="flex flex-col gap-3">
+        <tr className="sale-detail-row">
+          <td colSpan={5}>
+            <div className="sale-detail-inner">
               {/* Items */}
               <div>
-                <p className="text-xs font-semibold text-fg-muted uppercase mb-2">Productos</p>
-                <div className="flex flex-col gap-1">
-                  {(sale.items ?? []).map(item => (
-                    <div key={item.id} className="flex items-center justify-between text-sm">
-                      <span className="text-fg">
-                        {item.quantity}× {item.product_name}
-                        {item.customization && (
-                          <span className="text-xs text-fg-muted ml-2">({item.customization})</span>
-                        )}
-                      </span>
-                      <span className="font-medium text-fg">{fmt(item.subtotal)}</span>
-                    </div>
-                  ))}
-                </div>
+                <p className="sale-detail-label">Productos</p>
+                {(sale.items ?? []).map(item => (
+                  <div key={item.id} className="sale-item-line">
+                    <span className="sale-item-name">
+                      {item.quantity}× {item.product_name}
+                      {item.customization && (
+                        <span className="sale-item-custom">({item.customization})</span>
+                      )}
+                    </span>
+                    <span className="sale-item-price">{fmt(item.subtotal)}</span>
+                  </div>
+                ))}
               </div>
 
               {/* Notes */}
               {sale.notes && (
-                <p className="text-xs text-fg-muted border-t border-border pt-2">
-                  Nota: {sale.notes}
-                </p>
+                <p className="sale-notes">Nota: {sale.notes}</p>
               )}
 
               {/* Change status */}
-              <div className="flex items-center gap-2 border-t border-border pt-2">
-                <span className="text-xs font-medium text-fg-muted">Cambiar estado:</span>
-                <div className="flex flex-wrap gap-1">
-                  {ALL_STATUSES.filter(s => s !== sale.status).map(s => (
-                    <button
-                      key={s}
-                      disabled={saving}
-                      onClick={e => { e.stopPropagation(); handleStatus(s); }}
-                      className="px-2.5 py-1 text-xs border border-border rounded-lg
-                                 hover:border-accent hover:text-accent transition-colors
-                                 disabled:opacity-50"
-                    >
-                      → {saleService.getStatusLabel(s)}
-                    </button>
-                  ))}
-                </div>
+              <div className="status-actions">
+                <span className="status-label">Cambiar estado:</span>
+                {ALL_STATUSES.filter(s => s !== sale.status).map(s => (
+                  <button
+                    key={s}
+                    className="status-btn"
+                    disabled={saving}
+                    onClick={e => { e.stopPropagation(); handleStatus(s); }}
+                  >
+                    → {saleService.getStatusLabel(s)}
+                  </button>
+                ))}
               </div>
             </div>
           </td>
@@ -211,94 +195,87 @@ function NewSaleModal({ open, onClose, onSaved }: {
   return (
     <Modal open={open} onClose={onClose} title="Registrar venta" size="lg">
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-        {/* Cliente */}
-        <div className="grid grid-cols-2 gap-3">
+        {/* ── Cliente ── */}
+        <p className="sf-section-label">Datos del cliente</p>
+        <div className="sf-grid-2">
           <Input label="Nombre del cliente" value={customerName}
             onChange={e => setCN(e.target.value)} placeholder="Opcional" />
           <Input label="Teléfono" value={customerPhone}
             onChange={e => setCP(e.target.value)} placeholder="300..." />
         </div>
 
-        {/* Items */}
-        <div>
-          <div className="flex items-center justify-between mb-2">
-            <p className="text-sm font-medium text-fg">Productos</p>
-            <button type="button" onClick={addItem}
-              className="text-xs text-accent flex items-center gap-1 hover:underline">
-              <Plus size={12}/> Agregar línea
-            </button>
-          </div>
+        {/* ── Items ── */}
+        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center' }}>
+          <p className="sf-section-label" style={{ margin:0 }}>Productos</p>
+          <button type="button" className="sf-add-line" onClick={addItem}>
+            <Plus size={13}/> Agregar línea
+          </button>
+        </div>
 
-          <div className="flex flex-col gap-2">
-            {items.map((item, i) => (
-              <div key={i} className="grid gap-2 p-3 bg-bg rounded-lg border border-border"
-                style={{ gridTemplateColumns: '1fr 80px 70px auto' }}>
-
-                <div className="flex flex-col gap-1">
-                  <Select
-                    value={item.product_id}
-                    onChange={e => selectProduct(i, e.target.value)}
-                    options={productOptions}
-                    placeholder="Seleccionar producto"
-                  />
-                  {!item.product_id && (
-                    <input
-                      value={item.product_name}
-                      onChange={e => setItem(i, 'product_name', e.target.value)}
-                      placeholder="Nombre del producto"
-                      className="px-2 py-1.5 text-xs border border-border rounded-lg
-                                 bg-surface text-fg outline-none focus:border-accent"
-                    />
-                  )}
+        <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
+          {items.map((item, i) => (
+            <div key={i} className="sf-item-row">
+              <div className="sf-item-col">
+                <Select
+                  value={item.product_id}
+                  onChange={e => selectProduct(i, e.target.value)}
+                  options={productOptions}
+                  placeholder="Seleccionar producto"
+                />
+                {!item.product_id && (
                   <input
-                    value={item.customization}
-                    onChange={e => setItem(i, 'customization', e.target.value)}
-                    placeholder="Personalización (opcional)"
-                    className="px-2 py-1.5 text-xs border border-border rounded-lg
-                               bg-surface text-fg outline-none focus:border-accent"
+                    className="sf-item-input"
+                    value={item.product_name}
+                    onChange={e => setItem(i, 'product_name', e.target.value)}
+                    placeholder="Nombre del producto"
                   />
-                </div>
-
-                <input
-                  type="number"
-                  value={item.unit_price || ''}
-                  onChange={e => setItem(i, 'unit_price', Number(e.target.value))}
-                  placeholder="Precio"
-                  className="px-2 py-1.5 text-xs border border-border rounded-lg
-                             bg-surface text-fg outline-none focus:border-accent"
-                />
-                <input
-                  type="number"
-                  min={1}
-                  value={item.quantity}
-                  onChange={e => setItem(i, 'quantity', Number(e.target.value))}
-                  className="px-2 py-1.5 text-xs border border-border rounded-lg
-                             bg-surface text-fg outline-none focus:border-accent"
-                />
-                {items.length > 1 && (
-                  <button type="button" onClick={() => removeItem(i)}
-                    className="p-1.5 text-fg-muted hover:text-red-500 transition-colors">
-                    <Trash2 size={14}/>
-                  </button>
                 )}
+                <input
+                  className="sf-item-input"
+                  value={item.customization}
+                  onChange={e => setItem(i, 'customization', e.target.value)}
+                  placeholder="Personalización (opcional)"
+                />
               </div>
-            ))}
-          </div>
+
+              <input
+                type="number"
+                className="sf-item-input"
+                value={item.unit_price || ''}
+                onChange={e => setItem(i, 'unit_price', Number(e.target.value))}
+                placeholder="Precio"
+              />
+              <input
+                type="number"
+                min={1}
+                className="sf-item-input"
+                value={item.quantity}
+                onChange={e => setItem(i, 'quantity', Number(e.target.value))}
+              />
+              <button
+                type="button"
+                className="sf-item-remove"
+                onClick={() => removeItem(i)}
+                style={{ visibility: items.length > 1 ? 'visible' : 'hidden' }}
+              >
+                <Trash2 size={14}/>
+              </button>
+            </div>
+          ))}
         </div>
 
-        {/* Total */}
-        <div className="flex justify-end">
-          <div className="bg-bg border border-border rounded-lg px-4 py-2">
-            <span className="text-xs text-fg-muted">Total: </span>
-            <span className="text-base font-bold text-fg">{fmt(total)}</span>
-          </div>
+        {/* ── Total ── */}
+        <div className="sf-total-box">
+          <span className="sf-total-label">Total estimado:</span>
+          <span className="sf-total-value">{fmt(total)}</span>
         </div>
 
-        <Textarea label="Notas" value={notes}
+        {/* ── Notas ── */}
+        <Textarea label="Notas adicionales" value={notes}
           onChange={e => setNotes(e.target.value)}
           placeholder="Instrucciones especiales, dirección de entrega..." />
 
-        <div className="flex justify-end gap-2 pt-2 border-t border-border">
+        <div className="sf-actions">
           <Button type="button" variant="secondary" onClick={onClose}>Cancelar</Button>
           <Button type="submit" loading={loading}>Registrar venta</Button>
         </div>
@@ -336,34 +313,35 @@ export default function SalesPage() {
   ];
 
   return (
-    <div className="p-6 max-w-6xl mx-auto">
-      <div className="flex items-center justify-between mb-6">
+    <div className="sales-page">
+      {/* Header */}
+      <div className="sales-header">
         <div>
-          <h1 className="text-2xl font-bold text-fg">Ventas</h1>
-          <p className="text-sm text-fg-muted mt-0.5">{sales.length} en total</p>
+          <h1 className="sales-title">
+            <div className="sales-title-icon"><ShoppingCart size={20}/></div>
+            Ventas
+          </h1>
+          <p className="sales-subtitle">{sales.length} venta{sales.length !== 1 ? 's' : ''} registradas</p>
         </div>
         <Button icon={<Plus size={16}/>} onClick={() => setModal(true)}>
           Registrar venta
         </Button>
       </div>
 
-      {/* Filters */}
-      <div className="flex gap-3 mb-4">
-        <div className="relative">
-          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-fg-muted"/>
+      {/* Toolbar */}
+      <div className="sales-toolbar">
+        <div className="sales-search">
+          <Search size={14} className="sales-search-icon"/>
           <input
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder="Buscar cliente..."
-            className="pl-8 pr-3 py-2 text-sm border border-border rounded-lg bg-bg
-                       text-fg outline-none focus:border-accent placeholder:text-fg-muted"
           />
         </div>
         <select
+          className="sales-status-filter"
           value={statusFilter}
           onChange={e => setStatus(e.target.value as SaleStatus | '')}
-          className="px-3 py-2 text-sm border border-border rounded-lg bg-bg
-                     text-fg outline-none focus:border-accent"
         >
           {statusOptions.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
         </select>
@@ -371,9 +349,9 @@ export default function SalesPage() {
 
       {/* Loading */}
       {loading && (
-        <div className="flex flex-col gap-2">
+        <div className="sales-loading">
           {[...Array(5)].map((_, i) => (
-            <div key={i} className="h-14 bg-surface border border-border rounded-xl animate-pulse"/>
+            <div key={i} className="sales-skeleton"/>
           ))}
         </div>
       )}
@@ -390,15 +368,12 @@ export default function SalesPage() {
 
       {/* Table */}
       {!loading && filtered.length > 0 && (
-        <div className="bg-surface border border-border rounded-xl overflow-hidden">
-          <table className="w-full text-sm">
-            <thead className="bg-bg border-b border-border">
+        <div className="sales-table-wrap">
+          <table className="sales-table">
+            <thead>
               <tr>
                 {['Cliente', 'Fecha', 'Estado', 'Total', ''].map((h, i) => (
-                  <th key={i} className="text-left px-4 py-3 text-xs font-semibold
-                                          text-fg-muted uppercase tracking-wide">
-                    {h}
-                  </th>
+                  <th key={i}>{h}</th>
                 ))}
               </tr>
             </thead>

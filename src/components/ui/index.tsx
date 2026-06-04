@@ -143,24 +143,58 @@ interface ModalProps {
   size?: 'sm' | 'md' | 'lg';
 }
 
-const modalSizes = { sm: 'max-w-sm', md: 'max-w-lg', lg: 'max-w-2xl' };
 
 export function Modal({ open, onClose, title, children, size = 'md' }: ModalProps) {
   if (!open) return null;
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
-      style={{ background: 'rgba(0,0,0,0.45)' }}
       onClick={e => { if (e.target === e.currentTarget) onClose(); }}
+      style={{
+        position: 'fixed', inset: 0, zIndex: 50,
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        padding: '16px',
+        background: 'rgba(15,23,42,0.55)',
+        backdropFilter: 'blur(6px)',
+      }}
     >
-      <div className={`bg-surface rounded-xl border border-border w-full ${modalSizes[size]} shadow-xl`}>
-        <div className="flex items-center justify-between px-5 py-4 border-b border-border">
-          <h3 className="font-bold text-base text-fg">{title}</h3>
-          <button onClick={onClose} className="text-fg-muted hover:text-fg transition-colors">
-            <X size={18} />
+      <div
+        style={{
+          background: '#ffffff',
+          borderRadius: '20px',
+          border: '1px solid #e5e7eb',
+          width: '100%',
+          maxWidth: size === 'sm' ? '400px' : size === 'lg' ? '720px' : '560px',
+          boxShadow: '0 24px 64px rgba(0,0,0,.18)',
+          maxHeight: '90vh',
+          display: 'flex',
+          flexDirection: 'column',
+          overflow: 'hidden',
+        }}
+      >
+        {/* Header */}
+        <div style={{
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          padding: '18px 22px',
+          borderBottom: '1px solid #f3f4f6',
+          flexShrink: 0,
+        }}>
+          <h3 style={{ fontWeight: 700, fontSize: '1rem', color: '#111827' }}>{title}</h3>
+          <button
+            onClick={onClose}
+            style={{
+              width: 30, height: 30, borderRadius: 8, border: 'none',
+              background: 'transparent', cursor: 'pointer', color: '#9ca3af',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              transition: 'all .15s',
+            }}
+            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#f3f4f6'; (e.currentTarget as HTMLElement).style.color = '#111827'; }}
+            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; (e.currentTarget as HTMLElement).style.color = '#9ca3af'; }}
+          >
+            <X size={16} />
           </button>
         </div>
-        <div className="p-5">{children}</div>
+        {/* Body */}
+        <div style={{ padding: '22px', overflowY: 'auto', flex: 1 }}>{children}</div>
       </div>
     </div>
   );

@@ -2,10 +2,11 @@
 // Administración de vendedores — solo admin
 
 import { useState, useEffect } from 'react';
-import { UserPlus, Users, ShieldCheck, UserX, Mail } from 'lucide-react';
+import { UserPlus, Users, ShieldCheck, UserX, Mail, Search } from 'lucide-react';
 import { supabase } from '../lib/supabase';
-import { Button, Badge, Modal, Input, Empty, Card } from '../components/ui';
+import { Button, Badge, Modal, Input, Empty } from '../components/ui';
 import type { Profile } from '../types';
+import './UsersPage.css';
 
 // ── Invite modal ─────────────────────────────────────────────
 function InviteModal({ open, onClose, onDone }: {
@@ -47,45 +48,39 @@ function InviteModal({ open, onClose, onDone }: {
   return (
     <Modal open={open} onClose={() => { onClose(); reset(); }} title="Invitar vendedor">
       {sent ? (
-        <div className="flex flex-col items-center gap-3 py-4 text-center">
-          <div className="w-12 h-12 rounded-full bg-green-50 flex items-center justify-center">
-            <Mail size={22} className="text-green-600"/>
+        <div className="uf-success">
+          <div className="uf-success-icon">
+            <Mail size={24}/>
           </div>
-          <p className="font-semibold text-fg">¡Invitación enviada!</p>
-          <p className="text-sm text-fg-muted">
+          <p className="uf-success-title">¡Invitación enviada!</p>
+          <p className="uf-success-sub">
             {email} recibirá un correo para configurar su contraseña.
           </p>
           <Button onClick={() => { reset(); onClose(); }}>Cerrar</Button>
         </div>
       ) : (
-        <div className="flex flex-col gap-4">
+        <div style={{ display:'flex', flexDirection:'column', gap:16 }}>
           <Input label="Nombre completo" value={name}
             onChange={e => setName(e.target.value)} placeholder="Ana García" />
           <Input label="Correo electrónico" type="email" value={email}
             onChange={e => setEmail(e.target.value)} placeholder="vendedor@email.com" />
 
-          <div className="flex flex-col gap-1">
-            <label className="text-sm font-medium text-fg">Rol</label>
-            <div className="flex gap-3">
+          <div>
+            <p className="uf-role-label">Rol asignado</p>
+            <div className="uf-role-group">
               {(['seller', 'admin'] as const).map(r => (
-                <label key={r} className="flex items-center gap-2 cursor-pointer">
+                <label key={r} className="uf-role-option">
                   <input type="radio" name="role" value={r}
-                    checked={role === r} onChange={() => setRole(r)}
-                    className="accent-accent"/>
-                  <span className="text-sm text-fg capitalize">{r === 'seller' ? 'Vendedor' : 'Administrador'}</span>
+                    checked={role === r} onChange={() => setRole(r)}/>
+                  {r === 'seller' ? 'Vendedor' : 'Administrador'}
                 </label>
               ))}
             </div>
           </div>
 
-          {error && (
-            <div className="text-xs text-amber-700 bg-amber-50 border border-amber-200
-                            rounded-lg p-3 leading-relaxed">
-              {error}
-            </div>
-          )}
+          {error && <div className="uf-error-box">{error}</div>}
 
-          <div className="flex justify-end gap-2 pt-2 border-t border-border">
+          <div className="uf-actions">
             <Button variant="secondary" onClick={onClose}>Cancelar</Button>
             <Button onClick={handleInvite} loading={loading} icon={<Mail size={14}/>}>
               Enviar invitación
@@ -137,11 +132,15 @@ export default function UsersPage() {
   const adminCount  = users.filter(u => u.role === 'admin').length;
 
   return (
-    <div className="p-6 max-w-5xl mx-auto">
-      <div className="flex items-center justify-between mb-6">
+    <div className="users-page">
+      {/* Header */}
+      <div className="users-header">
         <div>
-          <h1 className="text-2xl font-bold text-fg">Vendedores</h1>
-          <p className="text-sm text-fg-muted mt-0.5">{users.length} usuarios registrados</p>
+          <h1 className="users-title">
+            <div className="users-title-icon"><Users size={20}/></div>
+            Vendedores
+          </h1>
+          <p className="users-subtitle">{users.length} usuario{users.length !== 1 ? 's' : ''} registrados</p>
         </div>
         <Button icon={<UserPlus size={16}/>} onClick={() => setInvite(true)}>
           Invitar vendedor
@@ -149,52 +148,47 @@ export default function UsersPage() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-3 gap-4 mb-6">
-        <Card className="flex items-center gap-3 !p-4">
-          <div className="p-2 rounded-lg bg-blue-50">
-            <Users size={18} className="text-blue-600"/>
-          </div>
+      <div className="users-stats">
+        <div className="ustat-card">
+          <div className="ustat-icon blue"><Users size={20}/></div>
           <div>
-            <p className="text-xs text-fg-muted">Total</p>
-            <p className="text-xl font-bold text-fg">{users.length}</p>
+            <p className="ustat-label">Total</p>
+            <p className="ustat-value">{users.length}</p>
           </div>
-        </Card>
-        <Card className="flex items-center gap-3 !p-4">
-          <div className="p-2 rounded-lg bg-green-50">
-            <Users size={18} className="text-green-600"/>
-          </div>
+        </div>
+        <div className="ustat-card">
+          <div className="ustat-icon green"><Users size={20}/></div>
           <div>
-            <p className="text-xs text-fg-muted">Activos</p>
-            <p className="text-xl font-bold text-fg">{activeCount}</p>
+            <p className="ustat-label">Activos</p>
+            <p className="ustat-value">{activeCount}</p>
           </div>
-        </Card>
-        <Card className="flex items-center gap-3 !p-4">
-          <div className="p-2 rounded-lg bg-purple-50">
-            <ShieldCheck size={18} className="text-purple-600"/>
-          </div>
+        </div>
+        <div className="ustat-card">
+          <div className="ustat-icon purple"><ShieldCheck size={20}/></div>
           <div>
-            <p className="text-xs text-fg-muted">Admins</p>
-            <p className="text-xl font-bold text-fg">{adminCount}</p>
+            <p className="ustat-label">Admins</p>
+            <p className="ustat-value">{adminCount}</p>
           </div>
-        </Card>
+        </div>
       </div>
 
       {/* Search */}
-      <div className="mb-4">
-        <input
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-          placeholder="Buscar por nombre o teléfono..."
-          className="w-full max-w-sm px-3 py-2 text-sm border border-border rounded-lg
-                     bg-bg text-fg outline-none focus:border-accent placeholder:text-fg-muted"
-        />
+      <div className="users-toolbar">
+        <div className="users-search">
+          <Search size={14} className="users-search-icon"/>
+          <input
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            placeholder="Buscar por nombre o teléfono..."
+          />
+        </div>
       </div>
 
       {/* Loading */}
       {loading && (
-        <div className="flex flex-col gap-2">
+        <div className="users-loading">
           {[...Array(4)].map((_, i) => (
-            <div key={i} className="h-16 bg-surface border border-border rounded-xl animate-pulse"/>
+            <div key={i} className="users-skeleton"/>
           ))}
         </div>
       )}
@@ -211,61 +205,53 @@ export default function UsersPage() {
 
       {/* Table */}
       {!loading && filtered.length > 0 && (
-        <div className="bg-surface border border-border rounded-xl overflow-hidden">
-          <table className="w-full text-sm">
-            <thead className="bg-bg border-b border-border">
+        <div className="users-table-wrap">
+          <table className="users-table">
+            <thead>
               <tr>
                 {['Vendedor', 'Rol', 'Estado', 'Se unió', 'Acciones'].map(h => (
-                  <th key={h} className="text-left px-4 py-3 text-xs font-semibold
-                                          text-fg-muted uppercase tracking-wide">{h}</th>
+                  <th key={h}>{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {filtered.map(user => (
-                <tr key={user.id} className="border-b border-border last:border-0 hover:bg-bg/50">
-                  <td className="px-4 py-3">
-                    <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-full bg-accent/10 flex items-center
-                                      justify-center text-sm font-bold text-accent flex-shrink-0">
+                <tr key={user.id}>
+                  <td>
+                    <div className="user-cell">
+                      <div className="user-avatar">
                         {user.full_name.charAt(0).toUpperCase()}
                       </div>
                       <div>
-                        <p className="font-medium text-fg">{user.full_name}</p>
-                        {user.phone && <p className="text-xs text-fg-muted">{user.phone}</p>}
+                        <p className="user-name">{user.full_name}</p>
+                        {user.phone && <p className="user-phone">{user.phone}</p>}
                       </div>
                     </div>
                   </td>
-                  <td className="px-4 py-3">
+                  <td>
                     <select
+                      className="role-select"
                       value={user.role}
                       onChange={e => changeRole(user, e.target.value as 'seller'|'admin')}
-                      className="text-xs border border-border rounded-lg px-2 py-1
-                                 bg-bg text-fg outline-none focus:border-accent"
                     >
                       <option value="seller">Vendedor</option>
                       <option value="admin">Admin</option>
                     </select>
                   </td>
-                  <td className="px-4 py-3">
+                  <td>
                     <Badge color={user.is_active ? 'green' : 'red'}>
                       {user.is_active ? 'Activo' : 'Inactivo'}
                     </Badge>
                   </td>
-                  <td className="px-4 py-3 text-xs text-fg-muted">
+                  <td style={{ fontSize: '.8rem', color: '#6b7280' }}>
                     {new Date(user.created_at).toLocaleDateString('es-CO')}
                   </td>
-                  <td className="px-4 py-3">
+                  <td>
                     <button
+                      className={`toggle-btn ${user.is_active ? 'deactivate' : 'activate'}`}
                       onClick={() => toggleActive(user)}
-                      className={`flex items-center gap-1.5 px-2.5 py-1.5 text-xs
-                                  rounded-lg border transition-all
-                                  ${user.is_active
-                                    ? 'border-red-200 text-red-600 hover:bg-red-50'
-                                    : 'border-green-200 text-green-600 hover:bg-green-50'
-                                  }`}
                     >
-                      <UserX size={12}/>
+                      <UserX size={13}/>
                       {user.is_active ? 'Desactivar' : 'Activar'}
                     </button>
                   </td>

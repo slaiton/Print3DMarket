@@ -2,7 +2,7 @@
 // Lista de productos + modal crear/editar
 
 import { useState, useRef, FormEvent } from 'react';
-import { Plus, Pencil, Trash2, Eye, EyeOff, ImagePlus, Package } from 'lucide-react';
+import { Plus, Pencil, Trash2, Eye, EyeOff, ImagePlus, Package, Search } from 'lucide-react';
 import { useMyProducts } from '../hooks/useMyProducts';
 import { productService } from '../services/productService';
 import { categoryService } from '../services/index';
@@ -11,6 +11,7 @@ import { Button, Input, Textarea, Select, Badge, Modal, Confirm, Empty } from '.
 import type { Product, CreateProductDTO } from '../types';
 import { useEffect } from 'react';
 import type { Category } from '../types';
+import './ProductsPage.css';
 
 // ── Form modal ───────────────────────────────────────────────
 function ProductModal({ open, onClose, product, onSaved }: {
@@ -123,50 +124,39 @@ function ProductModal({ open, onClose, product, onSaved }: {
       title={form.id ? 'Editar producto' : 'Nuevo producto'}
       size="lg"
     >
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-        {/* Imágenes */}
+      <form onSubmit={handleSubmit} style={{ display:'flex', flexDirection:'column', gap:18 }}>
+
+        {/* ── Imágenes ── */}
         <div>
-          <p className="text-sm font-medium text-fg mb-2">Imágenes</p>
-          <div className="flex flex-wrap gap-2">
+          <p className="pf-section-label">Imágenes del producto</p>
+          <div className="pf-img-grid">
             {(form.images ?? []).map(url => (
-              <div key={url} className="relative w-20 h-20 rounded-lg overflow-hidden border border-border">
-                <img src={url} alt="" className="w-full h-full object-cover" />
-                <button
-                  type="button"
-                  onClick={() => removeImage(url)}
-                  className="absolute top-0.5 right-0.5 bg-red-500 text-white
-                             rounded-full p-0.5 hover:bg-red-600"
-                >
+              <div key={url} className="pf-img-thumb">
+                <img src={url} alt="" />
+                <button type="button" className="pf-img-remove" onClick={() => removeImage(url)}>
                   <Trash2 size={10} />
                 </button>
               </div>
             ))}
             <button
               type="button"
+              className="pf-img-add"
               onClick={() => fileRef.current?.click()}
               disabled={uploadingImg}
-              className="w-20 h-20 border-2 border-dashed border-border rounded-lg
-                         flex flex-col items-center justify-center gap-1
-                         text-fg-muted hover:border-accent hover:text-accent transition-colors"
             >
               {uploadingImg
-                ? <span className="text-xs">Subiendo...</span>
-                : <><ImagePlus size={18}/><span className="text-xs">Agregar</span></>
+                ? <span>Subiendo…</span>
+                : <><ImagePlus size={20}/><span>Agregar</span></>
               }
             </button>
-            <input
-              ref={fileRef}
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={handleImage}
-            />
+            <input ref={fileRef} type="file" accept="image/*" style={{ display:'none' }} onChange={handleImage} />
           </div>
         </div>
 
-        {/* Nombre + categoría */}
-        <div className="grid grid-cols-2 gap-3">
-          <div className="col-span-2">
+        {/* ── Info básica ── */}
+        <p className="pf-section-label">Información básica</p>
+        <div className="pf-grid-2">
+          <div className="pf-col-full">
             <Input
               label="Nombre del producto *"
               value={form.name}
@@ -189,19 +179,20 @@ function ProductModal({ open, onClose, product, onSaved }: {
             placeholder="Seleccionar"
             options={materials}
           />
+          <div className="pf-col-full">
+            <Textarea
+              label="Descripción"
+              value={form.description ?? ''}
+              onChange={e => set('description', e.target.value)}
+              placeholder="Describe el producto, dimensiones, usos..."
+              rows={3}
+            />
+          </div>
         </div>
 
-        {/* Descripción */}
-        <Textarea
-          label="Descripción"
-          value={form.description ?? ''}
-          onChange={e => set('description', e.target.value)}
-          placeholder="Describe el producto, dimensiones, usos..."
-          rows={3}
-        />
-
-        {/* Precio + costo + stock */}
-        <div className="grid grid-cols-3 gap-3">
+        {/* ── Precios ── */}
+        <p className="pf-section-label">Precio y stock</p>
+        <div className="pf-grid-3">
           <Input
             label="Precio de venta *"
             type="number"
@@ -227,8 +218,9 @@ function ProductModal({ open, onClose, product, onSaved }: {
           />
         </div>
 
-        {/* Detalles técnicos */}
-        <div className="grid grid-cols-3 gap-3">
+        {/* ── Detalles técnicos ── */}
+        <p className="pf-section-label">Detalles técnicos</p>
+        <div className="pf-grid-3">
           <Input
             label="Color"
             value={form.color ?? ''}
@@ -252,26 +244,25 @@ function ProductModal({ open, onClose, product, onSaved }: {
           />
         </div>
 
-        {/* Toggles */}
-        <div className="flex gap-6">
+        {/* ── Opciones ── */}
+        <div className="pf-toggle-row">
           {[
             { field: 'is_available',    label: 'Disponible en catálogo' },
             { field: 'is_customizable', label: 'Acepta personalización' },
           ].map(({ field, label }) => (
-            <label key={field} className="flex items-center gap-2 cursor-pointer">
+            <label key={field} className="pf-toggle">
               <input
                 type="checkbox"
                 checked={Boolean(form[field as keyof typeof form])}
                 onChange={e => set(field, e.target.checked)}
-                className="w-4 h-4 accent-accent"
               />
-              <span className="text-sm text-fg">{label}</span>
+              {label}
             </label>
           ))}
         </div>
 
-        {/* Actions */}
-        <div className="flex justify-end gap-2 pt-2 border-t border-border">
+        {/* ── Acciones ── */}
+        <div className="pf-actions">
           <Button type="button" variant="secondary" onClick={onClose}>Cancelar</Button>
           <Button type="submit" loading={loading}>
             {form.id ? 'Guardar cambios' : 'Crear producto'}
@@ -316,32 +307,36 @@ export default function ProductsPage() {
   };
 
   return (
-    <div className="p-6 max-w-6xl mx-auto">
+    <div className="products-page">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-fg">Productos</h1>
-          <p className="text-sm text-fg-muted mt-0.5">{products.length} en total</p>
+      <div className="products-header">
+        <div className="products-header-left">
+          <h1 className="products-title">
+            <div className="products-title-icon"><Package size={20}/></div>
+            Productos
+          </h1>
+          <p className="products-subtitle">{products.length} producto{products.length !== 1 ? 's' : ''} en tu catálogo</p>
         </div>
         <Button icon={<Plus size={16}/>} onClick={openNew}>Nuevo producto</Button>
       </div>
 
-      {/* Search */}
-      <div className="mb-4">
-        <input
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-          placeholder="Buscar por nombre..."
-          className="w-full max-w-xs px-3 py-2 text-sm border border-border rounded-lg
-                     bg-bg text-fg outline-none focus:border-accent placeholder:text-fg-muted"
-        />
+      {/* Toolbar */}
+      <div className="products-toolbar">
+        <div className="products-search">
+          <Search size={14} className="products-search-icon"/>
+          <input
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            placeholder="Buscar por nombre..."
+          />
+        </div>
       </div>
 
       {/* Loading */}
       {loading && (
-        <div className="grid gap-3">
-          {[...Array(4)].map((_, i) => (
-            <div key={i} className="h-16 bg-surface border border-border rounded-xl animate-pulse"/>
+        <div className="products-loading">
+          {[...Array(5)].map((_, i) => (
+            <div key={i} className="products-skeleton"/>
           ))}
         </div>
       )}
@@ -358,68 +353,55 @@ export default function ProductsPage() {
 
       {/* Table */}
       {!loading && filtered.length > 0 && (
-        <div className="bg-surface border border-border rounded-xl overflow-hidden">
-          <table className="w-full text-sm">
-            <thead className="bg-bg border-b border-border">
+        <div className="products-table-wrap">
+          <table className="products-table">
+            <thead>
               <tr>
                 {['Producto', 'Precio', 'Stock', 'Estado', 'Acciones'].map(h => (
-                  <th key={h} className="text-left px-4 py-3 text-xs font-semibold
-                                         text-fg-muted uppercase tracking-wide">
-                    {h}
-                  </th>
+                  <th key={h}>{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {filtered.map(p => (
-                <tr key={p.id} className="border-b border-border last:border-0
-                                           hover:bg-bg/50 transition-colors">
-                  <td className="px-4 py-3">
-                    <div className="flex items-center gap-3">
+                <tr key={p.id}>
+                  <td>
+                    <div className="pt-thumb">
                       {p.images[0] ? (
-                        <img src={p.images[0]} alt="" className="w-10 h-10 rounded-lg object-cover flex-shrink-0"/>
+                        <img src={p.images[0]} alt="" className="pt-thumb img"/>
                       ) : (
-                        <div className="w-10 h-10 rounded-lg bg-bg border border-border
-                                        flex items-center justify-center flex-shrink-0">
-                          <Package size={16} className="text-fg-muted"/>
+                        <div className="pt-thumb-placeholder">
+                          <Package size={16}/>
                         </div>
                       )}
                       <div>
-                        <p className="font-medium text-fg">{p.name}</p>
-                        <p className="text-xs text-fg-muted">{p.material ?? '—'} · {p.color ?? '—'}</p>
+                        <p className="pt-name">{p.name}</p>
+                        <p className="pt-meta">{p.material ?? '—'} · {p.color ?? '—'}</p>
                       </div>
                     </div>
                   </td>
-                  <td className="px-4 py-3 font-semibold text-fg">
-                    {productService.formatPrice(p.price)}
-                  </td>
-                  <td className="px-4 py-3">
+                  <td className="pt-price">{productService.formatPrice(p.price)}</td>
+                  <td>
                     <Badge color={p.stock > 0 ? 'green' : 'red'}>{p.stock} uds</Badge>
                   </td>
-                  <td className="px-4 py-3">
+                  <td>
                     <Badge color={p.is_available ? 'green' : 'gray'}>
                       {p.is_available ? 'Disponible' : 'Oculto'}
                     </Badge>
                   </td>
-                  <td className="px-4 py-3">
-                    <div className="flex items-center gap-1">
+                  <td>
+                    <div className="pt-actions">
                       <button
+                        className="pt-btn"
                         onClick={() => toggleAvail(p)}
                         title={p.is_available ? 'Ocultar del catálogo' : 'Mostrar en catálogo'}
-                        className="p-1.5 rounded-lg hover:bg-bg text-fg-muted hover:text-fg transition-colors"
                       >
                         {p.is_available ? <EyeOff size={15}/> : <Eye size={15}/>}
                       </button>
-                      <button
-                        onClick={() => openEdit(p)}
-                        className="p-1.5 rounded-lg hover:bg-bg text-fg-muted hover:text-accent transition-colors"
-                      >
+                      <button className="pt-btn edit" onClick={() => openEdit(p)}>
                         <Pencil size={15}/>
                       </button>
-                      <button
-                        onClick={() => setDeleting(p)}
-                        className="p-1.5 rounded-lg hover:bg-bg text-fg-muted hover:text-red-500 transition-colors"
-                      >
+                      <button className="pt-btn del" onClick={() => setDeleting(p)}>
                         <Trash2 size={15}/>
                       </button>
                     </div>

@@ -4,16 +4,18 @@ import { Link } from 'react-router-dom';
 import { Package, ShoppingCart, DollarSign, Users, TrendingUp, ArrowRight, Clock } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuthStore } from '../store/useAuthStore';
-import { StatCard, Card, Badge } from '../components/ui';
+import { Badge } from '../components/ui';
 import { productService } from '../services/productService';
 import { saleService } from '../services/index';
 import type { SaleStatus } from '../types';
+import './DashboardPage.css';
+import DashboardHeader from './DashboardHeader';
 
-const STATUS_COLOR: Record<SaleStatus, 'gray'|'blue'|'amber'|'purple'|'green'|'red'> = {
-  pending:   'amber',
+const STATUS_COLOR: Record<SaleStatus, 'gray' | 'blue' | 'amber' | 'purple' | 'green' | 'red'> = {
+  pending: 'amber',
   confirmed: 'blue',
-  printing:  'purple',
-  ready:     'green',
+  printing: 'purple',
+  ready: 'green',
   delivered: 'gray',
   cancelled: 'red',
 };
@@ -52,127 +54,235 @@ export default function DashboardPage() {
   const greeting = hour < 12 ? 'Buenos días' : hour < 18 ? 'Buenas tardes' : 'Buenas noches';
 
   return (
-    <div className="p-6 max-w-6xl mx-auto">
-      {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-fg">
-          {greeting}, {profile?.full_name?.split(' ')[0]} 👋
-        </h1>
-        <p className="text-sm text-fg-muted mt-1">
-          {new Date().toLocaleDateString('es-CO', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
-        </p>
-      </div>
-
-      {/* Stats grid */}
-      {loading ? (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-          {[...Array(4)].map((_, i) => (
-            <div key={i} className="h-24 bg-surface border border-border rounded-xl animate-pulse" />
-          ))}
-        </div>
-      ) : (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-          {isAdmin ? (
-            <>
-              <StatCard label="Productos" value={stats.total_products ?? 0}
-                sub={`${stats.available_products ?? 0} disponibles`}
-                icon={<Package size={18}/>} color="blue"/>
-              <StatCard label="Ventas totales" value={stats.total_sales ?? 0}
-                sub={`${stats.sales_this_month ?? 0} este mes`}
-                icon={<ShoppingCart size={18}/>} color="purple"/>
-              <StatCard label="Ingresos totales" value={fmt(stats.revenue_total ?? 0)}
-                sub="Ventas no canceladas"
-                icon={<DollarSign size={18}/>} color="green"/>
-              <StatCard label="Vendedores activos" value={stats.total_sellers ?? 0}
-                sub={`${stats.total_customers ?? 0} clientes`}
-                icon={<Users size={18}/>} color="amber"/>
-            </>
-          ) : (
-            <>
-              <StatCard label="Mis productos" value={stats.my_products ?? 0}
-                icon={<Package size={18}/>} color="blue"/>
-              <StatCard label="Mis ventas" value={stats.my_sales ?? 0}
-                icon={<ShoppingCart size={18}/>} color="purple"/>
-              <StatCard label="Mis ingresos" value={fmt(stats.my_revenue ?? 0)}
-                sub="Total acumulado"
-                icon={<DollarSign size={18}/>} color="green"/>
-              <StatCard label="Este mes" value={fmt(stats.my_revenue_this_month ?? 0)}
-                sub={`${stats.pending_sales ?? 0} pendientes`}
-                icon={<TrendingUp size={18}/>} color="amber"/>
-            </>
-          )}
-        </div>
-      )}
-
-      {/* Content grid */}
-      <div className="grid md:grid-cols-2 gap-5">
-        {/* Recent sales */}
-        <Card>
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="font-bold text-fg flex items-center gap-2">
-              <Clock size={16} className="text-fg-muted" /> Ventas recientes
-            </h2>
-            <Link to="/sales" className="text-xs text-accent hover:underline flex items-center gap-1">
-              Ver todas <ArrowRight size={12}/>
-            </Link>
-          </div>
-          {recentSales.length === 0 ? (
-            <p className="text-sm text-fg-muted py-4 text-center">Sin ventas aún</p>
-          ) : (
-            <div className="flex flex-col gap-3">
-              {recentSales.map(sale => (
-                <div key={sale.id} className="flex items-center justify-between py-2
-                                              border-b border-border last:border-0">
-                  <div>
-                    <p className="text-sm font-medium text-fg">
-                      {sale.customer?.name ?? 'Cliente directo'}
-                    </p>
-                    <p className="text-xs text-fg-muted">
-                      {new Date(sale.created_at).toLocaleDateString('es-CO')}
-                      {' · '}{sale.items?.length ?? 0} item(s)
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Badge color={STATUS_COLOR[sale.status as SaleStatus]}>
-                      {saleService.getStatusLabel(sale.status)}
-                    </Badge>
-                    <span className="text-sm font-bold text-fg">
-                      {fmt(sale.total_amount)}
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </Card>
-
-        {/* Quick actions */}
-        <Card>
-          <h2 className="font-bold text-fg mb-4">Acciones rápidas</h2>
-          <div className="grid grid-cols-2 gap-3">
-            {[
-              { to: '/products/new', label: 'Nuevo producto', icon: Package,      color: 'bg-blue-50   text-blue-600' },
-              { to: '/sales/new',    label: 'Registrar venta', icon: ShoppingCart, color: 'bg-green-50  text-green-600' },
-              { to: '/products',     label: 'Ver catálogo',    icon: Package,      color: 'bg-purple-50 text-purple-600' },
-              { to: '/sales',        label: 'Ver ventas',      icon: TrendingUp,   color: 'bg-amber-50  text-amber-600' },
-            ].map(item => (
-              <Link
-                key={item.to}
-                to={item.to}
-                className="flex flex-col items-center gap-2 p-4 rounded-xl
-                           border border-border hover:border-accent/40
-                           hover:bg-bg transition-all group"
-              >
-                <div className={`p-2.5 rounded-lg ${item.color}`}>
-                  <item.icon size={20} />
-                </div>
-                <span className="text-xs font-medium text-fg text-center leading-tight">
-                  {item.label}
-                </span>
-              </Link>
+    <div className="dashboard-page">
+      <div className="dashboard-container">
+        {/* Header */}
+        <DashboardHeader
+          greeting={greeting}
+          fullName={profile?.full_name}
+        />
+        {/* Stats grid */}
+        {loading ? (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="h-24 bg-surface border border-border rounded-xl animate-pulse" />
             ))}
           </div>
-        </Card>
+        ) : (
+<div className="stats-grid">
+
+  {isAdmin ? (
+    <>
+      <div className="stat-box">
+        <div className="stat-icon blue">
+          <Package size={22} />
+        </div>
+
+        <div className="stat-label">
+          Productos
+        </div>
+
+        <div className="stat-value">
+          {stats.total_products ?? 0}
+        </div>
+
+        <div className="stat-sub">
+          {stats.available_products ?? 0} disponibles
+        </div>
+      </div>
+
+      <div className="stat-box">
+        <div className="stat-icon purple">
+          <ShoppingCart size={22} />
+        </div>
+
+        <div className="stat-label">
+          Ventas Totales
+        </div>
+
+        <div className="stat-value">
+          {stats.total_sales ?? 0}
+        </div>
+
+        <div className="stat-sub">
+          {stats.sales_this_month ?? 0} este mes
+        </div>
+      </div>
+
+      <div className="stat-box">
+        <div className="stat-icon green">
+          <DollarSign size={22} />
+        </div>
+
+        <div className="stat-label">
+          Ingresos Totales
+        </div>
+
+        <div className="stat-value">
+          {fmt(stats.revenue_total ?? 0)}
+        </div>
+
+        <div className="stat-sub">
+          Ventas no canceladas
+        </div>
+      </div>
+
+      <div className="stat-box">
+        <div className="stat-icon orange">
+          <Users size={22} />
+        </div>
+
+        <div className="stat-label">
+          Vendedores
+        </div>
+
+        <div className="stat-value">
+          {stats.total_sellers ?? 0}
+        </div>
+
+        <div className="stat-sub">
+          {stats.total_customers ?? 0} clientes
+        </div>
+      </div>
+    </>
+  ) : (
+    <>
+      <div className="stat-box">
+        <div className="stat-icon blue">
+          <Package size={22} />
+        </div>
+
+        <div className="stat-label">
+          Mis Productos
+        </div>
+
+        <div className="stat-value">
+          {stats.my_products ?? 0}
+        </div>
+
+        <div className="stat-sub">
+          Catálogo activo
+        </div>
+      </div>
+
+      <div className="stat-box">
+        <div className="stat-icon purple">
+          <ShoppingCart size={22} />
+        </div>
+
+        <div className="stat-label">
+          Mis Ventas
+        </div>
+
+        <div className="stat-value">
+          {stats.my_sales ?? 0}
+        </div>
+
+        <div className="stat-sub">
+          Ventas registradas
+        </div>
+      </div>
+
+      <div className="stat-box">
+        <div className="stat-icon green">
+          <DollarSign size={22} />
+        </div>
+
+        <div className="stat-label">
+          Mis Ingresos
+        </div>
+
+        <div className="stat-value">
+          {fmt(stats.my_revenue ?? 0)}
+        </div>
+
+        <div className="stat-sub">
+          Total acumulado
+        </div>
+      </div>
+
+      <div className="stat-box">
+        <div className="stat-icon orange">
+          <TrendingUp size={22} />
+        </div>
+
+        <div className="stat-label">
+          Este Mes
+        </div>
+
+        <div className="stat-value">
+          {fmt(stats.my_revenue_this_month ?? 0)}
+        </div>
+
+        <div className="stat-sub">
+          {stats.pending_sales ?? 0} pendientes
+        </div>
+      </div>
+    </>
+  )}
+
+</div>
+        )}
+
+        {/* Content grid */}
+        <div className="content-grid">
+          {/* Recent sales */}
+          <div className="glass-card">
+            <div className="card-title">
+              <h2 style={{ display:'flex', alignItems:'center', gap:8 }}>
+                <Clock size={16} style={{ opacity:.7 }} /> Ventas recientes
+              </h2>
+              <Link to="/sales" style={{ fontSize:'.8rem', color:'#60a5fa', display:'flex', alignItems:'center', gap:4, textDecoration:'none' }}>
+                Ver todas <ArrowRight size={12} />
+              </Link>
+            </div>
+            {recentSales.length === 0 ? (
+              <p style={{ textAlign:'center', color:'rgba(255,255,255,.45)', fontSize:'.875rem', padding:'16px 0' }}>Sin ventas aún</p>
+            ) : (
+              <div className="sales-list">
+                {recentSales.map(sale => (
+                  <div key={sale.id} className="sale-item">
+                    <div>
+                      <p className="sale-name">{sale.customer?.name ?? 'Cliente directo'}</p>
+                      <p className="sale-date">
+                        {new Date(sale.created_at).toLocaleDateString('es-CO')}
+                        {' · '}{sale.items?.length ?? 0} item(s)
+                      </p>
+                    </div>
+                    <div style={{ display:'flex', alignItems:'center', gap:8 }}>
+                      <Badge color={STATUS_COLOR[sale.status as SaleStatus]}>
+                        {saleService.getStatusLabel(sale.status)}
+                      </Badge>
+                      <span className="sale-total">{fmt(sale.total_amount)}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Quick actions */}
+          <div className="glass-card">
+            <div className="card-title">
+              <h2>Acciones rápidas</h2>
+            </div>
+            <div className="quick-grid">
+              {[
+                { to: '/products', label: 'Nuevo producto', icon: Package,      color: 'quick-blue'   },
+                { to: '/sales',    label: 'Registrar venta', icon: ShoppingCart, color: 'quick-green'  },
+                { to: '/products', label: 'Ver productos',   icon: Package,      color: 'quick-purple' },
+                { to: '/sales',    label: 'Ver ventas',      icon: TrendingUp,   color: 'quick-orange' },
+              ].map(item => (
+                <Link key={item.label} to={item.to} className="quick-action">
+                  <div className={`quick-icon ${item.color}`}>
+                    <item.icon size={20} />
+                  </div>
+                  <span className="quick-label">{item.label}</span>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
