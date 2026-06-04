@@ -26,7 +26,7 @@ export interface Category {
 export interface Product {
   id: string;
   seller_id: string;
-  category_id: string | null;
+  category_id: string;
   name: string;
   description: string | null;
   price: number;
@@ -91,7 +91,7 @@ export interface SaleItem {
 
 // DTOs para crear/actualizar
 export interface CreateProductDTO {
-  category_id?: string;
+  category_id: string;
   name: string;
   description?: string;
   price: number;

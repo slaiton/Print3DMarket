@@ -3,7 +3,7 @@
 
 import { useState, useRef, FormEvent } from 'react';
 import { Plus, Pencil, Trash2, Eye, EyeOff, ImagePlus, Package } from 'lucide-react';
-import { useMyProducts } from '../hooks/useCatalog';
+import { useMyProducts } from '../hooks/useMyProducts';
 import { productService } from '../services/productService';
 import { categoryService } from '../services/index';
 import { useAuthStore } from '../store/useAuthStore';
@@ -39,7 +39,23 @@ function ProductModal({ open, onClose, product, onSaved }: {
 
   useEffect(() => {
     if (product) {
-      setForm({ ...product });
+      setForm({
+        id: product.id,
+        name: product.name,
+        description: product.description ?? '',
+        price: product.price,
+        cost: product.cost ?? undefined,
+        material: product.material ?? '',
+        color: product.color ?? '',
+        stock: product.stock,
+        is_available: product.is_available,
+        is_customizable: product.is_customizable,
+        images: product.images ?? [],
+        tags: product.tags ?? [],
+        category_id: product.category_id ?? '',
+        print_time_hrs: product.print_time_hrs ?? undefined,
+        weight_grams: product.weight_grams ?? undefined,
+      });
     } else {
       setForm({
         name: '', description: '', price: 0, cost: undefined,

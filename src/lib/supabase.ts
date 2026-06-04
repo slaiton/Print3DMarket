@@ -1,6 +1,3 @@
-// src/lib/supabase.ts
-// Cliente Supabase — único punto de contacto con el BaaS
-
 import { createClient } from '@supabase/supabase-js';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
