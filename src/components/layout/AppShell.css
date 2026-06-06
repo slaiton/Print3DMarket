@@ -292,6 +292,73 @@
   }
 }
 
+/* ── Maestros group ────────────────────────────────────────── */
+
+.shell-nav-group {
+  display: flex;
+  flex-direction: column;
+  margin-top: 4px;
+}
+
+.shell-group-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 12px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+  transition: background .15s;
+}
+
+.shell-group-header:hover {
+  background: #f9fafb;
+}
+
+.shell-group-label {
+  font-size: .7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: #9ca3af;
+  flex: 1;
+}
+
+.shell-group-header.open .shell-group-label {
+  color: #6b7280;
+}
+
+.group-chevron {
+  color: #c4c9d4;
+  flex-shrink: 0;
+  transition: transform .2s;
+}
+
+.shell-group-header.open .group-chevron {
+  transform: rotate(180deg);
+}
+
+.shell-group-items {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height .25s ease;
+}
+
+.shell-group-items.open {
+  max-height: 200px;
+}
+
+.shell-nav-link--sub {
+  padding-left: 20px;
+  font-size: .825rem;
+}
+
 /* ── Page content ──────────────────────────────────────────── */
 
 .shell-content {

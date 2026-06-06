@@ -64,7 +64,7 @@ export const productService = {
   async getMyProducts(): Promise<Product[]> {
     const { data, error } = await supabase
       .from('products')
-      .select(`*, category:categories(id, name, slug, icon)`)
+      .select(`*, category:categories(id, name, slug, icon), seller:profiles(id, full_name)`)
       .order('created_at', { ascending: false });
 
     if (error) throw new Error(error.message);

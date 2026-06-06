@@ -1,0 +1,37 @@
+/* ── Resets ──────────────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'DM Sans', 'Helvetica Neue', sans-serif;
+  background: var(--bg);
+  color: var(--fg);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Tailwind-compatible utility classes ─────────────────────── */
+/* These bridge the gap between Tailwind class names and our      */
+/* CSS custom properties, since Tailwind doesn't know about them. */
+
+.bg-bg              { background-color: var(--bg); }
+.bg-surface         { background-color: var(--surface); }
+.text-fg            { color: var(--fg); }
+.text-fg-muted      { color: var(--fg-muted); }
+.text-accent        { color: var(--accent); }
+.border-border      { border-color: var(--border); }
+.border-accent      { border-color: var(--accent); }
+.accent             { color: var(--accent); }
+.bg-accent          { background-color: var(--accent); }
+.bg-accent-dark     { background-color: var(--accent-dark); }
+
+.focus\:border-accent:focus   { border-color: var(--accent); }
+.hover\:border-accent:hover   { border-color: var(--accent); }
+.hover\:bg-accent:hover       { background-color: var(--accent); }
+.hover\:bg-accent-dark:hover  { background-color: var(--accent-dark); }
+.hover\:text-accent:hover     { color: var(--accent); }
+
+.accent\/10 { background-color: rgba(232, 93, 4, 0.1); }
+.accent\/40 { border-color:     rgba(232, 93, 4, 0.4); }

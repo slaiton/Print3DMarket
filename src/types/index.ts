@@ -108,6 +108,7 @@ export interface CreateProductDTO {
 }
 
 export interface CreateSaleDTO {
+  seller_id?: string;
   customer_id?: string;
   notes?: string;
   items: {

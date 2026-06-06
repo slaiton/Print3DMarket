@@ -4,7 +4,7 @@
 .products-page {
   min-height: 100%;
   padding: 32px;
-  background: #f8f9fc;
+  background: var(--bg);
 }
 
 /* ── Header banner ─────────────────────────────────────────── */
@@ -83,8 +83,8 @@
 }
 
 .products-search input:focus {
-  border-color: #e85d04;
-  box-shadow: 0 0 0 3px rgba(232,93,4,.1);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(232, 93, 4, .1);
 }
 
 .products-search input::placeholder {
@@ -217,9 +217,10 @@
   color: #374151;
 }
 
+
 .pt-btn.edit:hover {
   background: #fff7ed;
-  color: #e85d04;
+  color: var(--accent);
 }
 
 .pt-btn.del:hover {
@@ -312,9 +313,9 @@
 }
 
 .pf-img-add:hover {
-  border-color: #e85d04;
-  color: #e85d04;
-  background: #fff7ed;
+  border-color: var(--accent);
+  color: var(--accent);
+  background: rgba(232, 93, 4, .06);
 }
 
 .pf-img-add:disabled {
@@ -376,7 +377,7 @@
 .pf-toggle input[type="checkbox"] {
   width: 16px;
   height: 16px;
-  accent-color: #e85d04;
+  accent-color: var(--accent);
   cursor: pointer;
 }
 

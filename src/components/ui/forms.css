@@ -1,0 +1,84 @@
+/* ── Shared form field styles ────────────────────────────────── */
+
+.ui-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.ui-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--fg);
+  letter-spacing: 0.01em;
+}
+
+/* Base: input, select, textarea */
+.ui-control {
+  width: 100%;
+  padding: 9px 12px;
+  font-size: 0.875rem;
+  font-family: inherit;
+  color: var(--fg);
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  line-height: 1.5;
+}
+
+.ui-control:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(232, 93, 4, 0.1);
+}
+
+.ui-control::placeholder {
+  color: var(--fg-muted);
+  opacity: 1;
+}
+
+.ui-control:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  background: var(--bg);
+}
+
+.ui-control.is-error {
+  border-color: #ef4444;
+}
+
+.ui-control.is-error:focus {
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+/* Select arrow */
+.ui-select {
+  appearance: none;
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%236b7280'%3E%3Cpath fill-rule='evenodd' d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z' clip-rule='evenodd'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 16px;
+  padding-right: 34px;
+}
+
+/* Textarea */
+.ui-textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+/* Helper texts */
+.ui-hint {
+  font-size: 0.72rem;
+  color: var(--fg-muted);
+}
+
+.ui-error-msg {
+  font-size: 0.72rem;
+  color: #ef4444;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}

@@ -1,0 +1,20 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700;9..40,800&display=swap');
+
+:root {
+  /* ── Brand ─────────────────────────────────── */
+  --accent:      #e85d04;
+  --accent-dark: #cc5200;
+
+  /* ── Semantic ──────────────────────────────── */
+  --fg:       #0f0f0f;
+  --fg-muted: #6b7280;
+  --bg:       #f7f5f0;
+  --surface:  #ffffff;
+  --border:   #e5e7eb;
+
+  /* ── Layout ────────────────────────────────── */
+  --radius:    10px;
+  --radius-lg: 16px;
+  --shadow:    0 2px 12px rgba(0, 0, 0, 0.07);
+  --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.12);
+}

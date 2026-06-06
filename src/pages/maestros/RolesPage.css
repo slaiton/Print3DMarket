@@ -1,0 +1,284 @@
+.roles-page {
+  min-height: 100%;
+  padding: 32px;
+  background: var(--bg);
+}
+
+/* ── Header ──────────────────────────────────────────────────── */
+
+.roles-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding: 26px 30px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, var(--surface) 0%, #f5f3ff 100%);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+}
+
+.roles-title {
+  font-size: 1.55rem;
+  font-weight: 800;
+  color: var(--fg);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.roles-title-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--accent), #fb923c);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  flex-shrink: 0;
+}
+
+.roles-subtitle {
+  margin-top: 5px;
+  font-size: .875rem;
+  color: var(--fg-muted);
+}
+
+/* ── Info banner ─────────────────────────────────────────────── */
+
+.roles-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 16px;
+  background: rgba(232, 93, 4, .06);
+  border: 1.5px solid rgba(232, 93, 4, .2);
+  border-radius: 10px;
+  font-size: .82rem;
+  color: #92400e;
+  margin-bottom: 28px;
+  line-height: 1.6;
+}
+
+.roles-banner svg { flex-shrink: 0; margin-top: 2px; color: var(--accent); }
+
+/* ── Role cards grid ─────────────────────────────────────────── */
+
+.roles-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 20px;
+  margin-bottom: 32px;
+}
+
+.role-card {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 18px;
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  transition: box-shadow .2s, transform .2s;
+}
+
+.role-card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.role-card--admin  { border-top: 3px solid #7c3aed; }
+.role-card--seller { border-top: 3px solid #2563eb; }
+
+/* Card header */
+.role-card-header {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.role-icon {
+  width: 46px;
+  height: 46px;
+  border-radius: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.role-icon--admin  { background: #f5f3ff; color: #7c3aed; }
+.role-icon--seller { background: #eff6ff; color: #2563eb; }
+
+.role-card-title-group { flex: 1; min-width: 0; }
+
+.role-card-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+  flex-wrap: wrap;
+}
+
+.role-card-name {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--fg);
+}
+
+.role-card-desc {
+  font-size: .82rem;
+  color: var(--fg-muted);
+  line-height: 1.6;
+}
+
+/* User count pill */
+.role-user-count {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: .78rem;
+  font-weight: 600;
+  color: var(--fg-muted);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 99px;
+  padding: 4px 12px;
+  align-self: flex-start;
+}
+
+/* Permissions list */
+.role-permissions-title {
+  font-size: .72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: #9ca3af;
+  margin-bottom: 10px;
+}
+
+.role-perm-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.role-perm-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: .82rem;
+}
+
+.role-perm-item.has { color: var(--fg); }
+.role-perm-item.no  { color: #c4c9d4; }
+
+.perm-icon-wrap {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.perm-icon-wrap.has { background: #dcfce7; color: #16a34a; }
+.perm-icon-wrap.no  { background: #f3f4f6; color: #9ca3af; }
+
+.perm-module-icon { color: inherit; flex-shrink: 0; }
+
+/* ── Permissions matrix ──────────────────────────────────────── */
+
+.roles-matrix-wrap {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+
+.roles-matrix-title {
+  font-size: .875rem;
+  font-weight: 700;
+  color: var(--fg);
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  background: #fafafa;
+}
+
+.roles-matrix-table-wrap {
+  overflow-x: auto;
+}
+
+.roles-matrix-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.roles-matrix-table th {
+  padding: 12px 20px;
+  text-align: left;
+  font-size: .72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--fg-muted);
+  background: #f9fafb;
+  border-bottom: 1px solid var(--border);
+}
+
+.roles-matrix-table td {
+  padding: 13px 20px;
+  border-bottom: 1px solid #f3f4f6;
+  font-size: .875rem;
+}
+
+.roles-matrix-table tr:last-child td { border-bottom: none; }
+
+.roles-matrix-table tr:hover td { background: #fafafa; }
+
+.matrix-role-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  font-size: .75rem;
+  padding: 3px 10px;
+  border-radius: 99px;
+}
+
+.matrix-role--admin  { background: #f5f3ff; color: #7c3aed; }
+.matrix-role--seller { background: #eff6ff; color: #2563eb; }
+
+.matrix-module {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--fg);
+  font-weight: 500;
+}
+
+.matrix-cell { text-align: center; }
+
+.matrix-check {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.matrix-check.has { background: #dcfce7; color: #16a34a; }
+.matrix-check.no  { background: #f3f4f6; color: #d1d5db; }
+
+/* ── Responsive ──────────────────────────────────────────────── */
+
+@media (max-width: 768px) {
+  .roles-page  { padding: 18px; }
+  .roles-grid  { grid-template-columns: 1fr; }
+  .roles-header { flex-direction: column; align-items: flex-start; gap: 12px; }
+}

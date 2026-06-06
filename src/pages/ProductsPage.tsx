@@ -1,7 +1,5 @@
 // src/pages/ProductsPage.tsx
-// Lista de productos + modal crear/editar
-
-import { useState, useRef, FormEvent } from 'react';
+import { useState, useRef, FormEvent, useEffect } from 'react';
 import { Plus, Pencil, Trash2, Eye, EyeOff, ImagePlus, Package, Search } from 'lucide-react';
 import { useMyProducts } from '../hooks/useMyProducts';
 import { productService } from '../services/productService';
@@ -9,7 +7,6 @@ import { categoryService } from '../services/index';
 import { useAuthStore } from '../store/useAuthStore';
 import { Button, Input, Textarea, Select, Badge, Modal, Confirm, Empty } from '../components/ui';
 import type { Product, CreateProductDTO } from '../types';
-import { useEffect } from 'react';
 import type { Category } from '../types';
 import './ProductsPage.css';
 
@@ -35,8 +32,8 @@ function ProductModal({ open, onClose, product, onSaved }: {
   });
 
   useEffect(() => {
-    categoryService.getAll().then(setCategories);
-  }, []);
+    if (open) categoryService.getAll().then(setCategories);
+  }, [open]);
 
   useEffect(() => {
     if (product) {
@@ -62,6 +59,7 @@ function ProductModal({ open, onClose, product, onSaved }: {
         name: '', description: '', price: 0, cost: undefined,
         material: '', color: '', stock: 0, is_available: true,
         is_customizable: false, images: [], tags: [], category_id: '',
+        print_time_hrs: undefined, weight_grams: undefined,
       });
     }
     setErrors({});
@@ -72,8 +70,8 @@ function ProductModal({ open, onClose, product, onSaved }: {
 
   const validate = () => {
     const e: Record<string, string> = {};
-    if (!form.name.trim())    e.name  = 'El nombre es requerido';
-    if (form.price <= 0)      e.price = 'El precio debe ser mayor a 0';
+    if (!form.name.trim()) e.name  = 'El nombre es requerido';
+    if (form.price <= 0)   e.price = 'El precio debe ser mayor a 0';
     setErrors(e);
     return Object.keys(e).length === 0;
   };
@@ -85,7 +83,7 @@ function ProductModal({ open, onClose, product, onSaved }: {
     try {
       const url = await productService.uploadImage(file, profile.id);
       set('images', [...(form.images ?? []), url]);
-    } catch (err) {
+    } catch {
       alert('Error al subir imagen');
     } finally {
       setUploadingImg(false);
@@ -124,7 +122,7 @@ function ProductModal({ open, onClose, product, onSaved }: {
       title={form.id ? 'Editar producto' : 'Nuevo producto'}
       size="lg"
     >
-      <form onSubmit={handleSubmit} style={{ display:'flex', flexDirection:'column', gap:18 }}>
+      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
 
         {/* ── Imágenes ── */}
         <div>
@@ -149,7 +147,7 @@ function ProductModal({ open, onClose, product, onSaved }: {
                 : <><ImagePlus size={20}/><span>Agregar</span></>
               }
             </button>
-            <input ref={fileRef} type="file" accept="image/*" style={{ display:'none' }} onChange={handleImage} />
+            <input ref={fileRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={handleImage} />
           </div>
         </div>
 
@@ -190,7 +188,7 @@ function ProductModal({ open, onClose, product, onSaved }: {
           </div>
         </div>
 
-        {/* ── Precios ── */}
+        {/* ── Precios y stock ── */}
         <p className="pf-section-label">Precio y stock</p>
         <div className="pf-grid-3">
           <Input
@@ -286,7 +284,7 @@ export default function ProductsPage() {
     p.name.toLowerCase().includes(search.toLowerCase())
   );
 
-  const openNew  = () => { setEditing(null);    setModalOpen(true); };
+  const openNew  = () => { setEditing(null); setModalOpen(true); };
   const openEdit = (p: Product) => { setEditing(p); setModalOpen(true); };
 
   const handleDelete = async () => {
@@ -315,7 +313,9 @@ export default function ProductsPage() {
             <div className="products-title-icon"><Package size={20}/></div>
             Productos
           </h1>
-          <p className="products-subtitle">{products.length} producto{products.length !== 1 ? 's' : ''} en tu catálogo</p>
+          <p className="products-subtitle">
+            {products.length} producto{products.length !== 1 ? 's' : ''} en tu catálogo
+          </p>
         </div>
         <Button icon={<Plus size={16}/>} onClick={openNew}>Nuevo producto</Button>
       </div>
@@ -335,9 +335,7 @@ export default function ProductsPage() {
       {/* Loading */}
       {loading && (
         <div className="products-loading">
-          {[...Array(5)].map((_, i) => (
-            <div key={i} className="products-skeleton"/>
-          ))}
+          {[...Array(5)].map((_, i) => <div key={i} className="products-skeleton"/>)}
         </div>
       )}
 

@@ -249,6 +249,36 @@
   border-color: #7c3aed;
 }
 
+/* Actions cell */
+.user-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+/* Edit button */
+.user-edit-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  font-size: .8rem;
+  font-weight: 500;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  color: var(--fg-muted);
+  background: transparent;
+  cursor: pointer;
+  transition: all .15s;
+}
+
+.user-edit-btn:hover {
+  background: #fff4ed;
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
 /* toggle button */
 .toggle-btn {
   display: inline-flex;

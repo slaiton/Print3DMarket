@@ -63,6 +63,7 @@ export const saleService = {
       .select(`
         *,
         customer:customers(id, name, phone),
+        seller:profiles(id, full_name),
         items:sale_items(*)
       `)
       .order('created_at', { ascending: false });
@@ -71,12 +72,12 @@ export const saleService = {
     return (data ?? []) as Sale[];
   },
 
-  async create(dto: CreateSaleDTO, sellerId: string): Promise<Sale> {
+  async create(dto: CreateSaleDTO, fallbackSellerId: string): Promise<Sale> {
     // 1. Crear cabecera de venta
     const { data: sale, error: saleError } = await supabase
       .from('sales')
       .insert({
-        seller_id: sellerId,
+        seller_id: dto.seller_id ?? fallbackSellerId,
         customer_id: dto.customer_id ?? null,
         notes: dto.notes ?? null,
       })
@@ -106,7 +107,18 @@ export const saleService = {
       .from('sales')
       .update({ status })
       .eq('id', id);
+    if (error) throw new Error(error.message);
+  },
 
+  async updateSale(id: string, updates: {
+    seller_id?: string;
+    status?: Sale['status'];
+    notes?: string | null;
+  }): Promise<void> {
+    const { error } = await supabase
+      .from('sales')
+      .update({ ...updates, updated_at: new Date().toISOString() })
+      .eq('id', id);
     if (error) throw new Error(error.message);
   },
 
