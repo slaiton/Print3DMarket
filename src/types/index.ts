@@ -10,6 +10,7 @@ export interface Profile {
   phone: string | null;
   avatar_url: string | null;
   is_active: boolean;
+  commission_pct: number;   // % comisión sobre ventas (0-100)
   created_at: string;
   updated_at: string;
 }

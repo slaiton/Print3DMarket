@@ -13,7 +13,7 @@ import './AppShell.css';
 // ── Nav structure ─────────────────────────────────────────────
 const NAV_ITEMS = [
   { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, roles: ['admin', 'seller'] },
-  { to: '/products',  label: 'Productos',  icon: Package,          roles: ['admin', 'seller'] },
+  { to: '/products',  label: 'Productos',  icon: Package,          roles: ['admin']           },
   { to: '/sales',     label: 'Ventas',     icon: ShoppingCart,     roles: ['admin', 'seller'] },
 ];
 

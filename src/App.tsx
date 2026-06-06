@@ -9,7 +9,8 @@ import DashboardPage from './pages/DashboardPage';
 import ProductsPage  from './pages/ProductsPage';
 import SalesPage     from './pages/SalesPage';
 import UsersPage     from './pages/UsersPage';
-import RolesPage     from './pages/maestros/RolesPage';
+import RolesPage          from './pages/maestros/RolesPage';
+import ResetPasswordPage  from './pages/login/ResetPasswordPage';
 
 // ── Loading screen ────────────────────────────────────────────
 function LoadingScreen() {
@@ -66,16 +67,17 @@ export default function App() {
         {/* ── Públicas (sin sesión) ─────────────────────── */}
         <Route path="/"        element={<CatalogPage />} />
         <Route path="/catalog" element={<CatalogPage />} />
-        <Route path="/login"   element={<LoginPage />} />
+        <Route path="/login"          element={<LoginPage />} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
 
         {/* ── Autenticadas (admin + seller) ─────────────── */}
         <Route element={<RequireAuth />}>
           <Route path="/dashboard" element={<DashboardPage />} />
-          <Route path="/products"  element={<ProductsPage />} />
           <Route path="/sales"     element={<SalesPage />} />
 
           {/* ── Solo admin ────────────────────────────────── */}
           <Route element={<RequireAdmin />}>
+            <Route path="/products"  element={<ProductsPage />} />
             {/* Alias de compatibilidad */}
             <Route path="/users" element={<Navigate to="/maestros/usuarios" replace />} />
             {/* Módulo Maestros */}

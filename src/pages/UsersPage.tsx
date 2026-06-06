@@ -2,7 +2,7 @@
 // Administración de usuarios — solo admin
 
 import { useState, useEffect } from 'react';
-import { UserPlus, Users, ShieldCheck, UserX, Mail, Search, Pencil } from 'lucide-react';
+import { UserPlus, Users, ShieldCheck, UserX, Mail, Search, Pencil, KeyRound, Eye, EyeOff } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { Button, Badge, Modal, Input, Empty } from '../components/ui';
 import type { Profile } from '../types';
@@ -94,30 +94,43 @@ function EditUserModal({ user, open, onClose, onDone }: {
   const [loading, setLoading] = useState(false);
   const [error, setError]     = useState('');
 
+  const [commission, setCommission] = useState('');
+
   // Sincroniza campos cuando cambia el usuario seleccionado
   useEffect(() => {
     if (user) {
       setName(user.full_name ?? '');
-      // El email viene de auth.users, no de profiles — lo dejamos vacío
-      // para que el admin solo edite si quiere cambiarlo
       setEmail('');
+      setCommission(String(user.commission_pct ?? 0));
       setError('');
     }
   }, [user]);
 
   const handleSave = async () => {
     if (!name.trim()) { setError('El nombre no puede estar vacío'); return; }
+    const pct = parseFloat(commission);
+    if (isNaN(pct) || pct < 0 || pct > 100) {
+      setError('La comisión debe ser un número entre 0 y 100');
+      return;
+    }
     setLoading(true);
     setError('');
     try {
+      // Actualiza nombre y email via Edge Function
       const body: Record<string, string> = { user_id: user!.id, full_name: name.trim() };
       if (email.trim()) body.email = email.trim();
 
-      const { data, error: fnError } = await supabase.functions.invoke('update-user', {
-        body,
-      });
+      const { data, error: fnError } = await supabase.functions.invoke('update-user', { body });
       if (fnError) throw fnError;
       if (data?.error) throw new Error(data.error);
+
+      // Actualiza commission_pct directamente en profiles (no necesita service_role)
+      const { error: profileErr } = await supabase
+        .from('profiles')
+        .update({ commission_pct: pct })
+        .eq('id', user!.id);
+      if (profileErr) throw profileErr;
+
       onDone();
       onClose();
     } catch (e: any) {
@@ -144,6 +157,17 @@ function EditUserModal({ user, open, onClose, onDone }: {
           placeholder="Dejar vacío para no cambiar"
           hint="Solo completa si quieres cambiar el correo actual."
         />
+        <Input
+          label="% Comisión"
+          type="number"
+          min="0"
+          max="100"
+          step="0.5"
+          value={commission}
+          onChange={e => setCommission(e.target.value)}
+          placeholder="0"
+          hint="Porcentaje sobre las ventas (ej: 10 = 10%). Solo aplica a vendedores."
+        />
 
         {error && <div className="uf-error-box">{error}</div>}
 
@@ -158,13 +182,128 @@ function EditUserModal({ user, open, onClose, onDone }: {
   );
 }
 
+// ── Change password modal ─────────────────────────────────────
+function ChangePasswordModal({ user, open, onClose }: {
+  user: Profile | null; open: boolean; onClose: () => void;
+}) {
+  const [password, setPassword]   = useState('');
+  const [confirm, setConfirm]     = useState('');
+  const [showPw, setShowPw]       = useState(false);
+  const [loading, setLoading]     = useState(false);
+  const [error, setError]         = useState('');
+  const [success, setSuccess]     = useState(false);
+
+  const reset = () => { setPassword(''); setConfirm(''); setError(''); setSuccess(false); };
+
+  const handleSave = async () => {
+    if (password.length < 6) { setError('Mínimo 6 caracteres'); return; }
+    if (password !== confirm) { setError('Las contraseñas no coinciden'); return; }
+    setLoading(true);
+    setError('');
+    try {
+      const { data, error: fnError } = await supabase.functions.invoke('reset-user-password', {
+        body: { user_id: user!.id, new_password: password },
+      });
+      if (fnError) throw fnError;
+      if (data?.error) throw new Error(data.error);
+      setSuccess(true);
+      setTimeout(() => { onClose(); reset(); }, 1800);
+    } catch (e: any) {
+      setError(e.message ?? 'Error al cambiar la contraseña');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <Modal open={open} onClose={() => { onClose(); reset(); }} title="Cambiar contraseña">
+      {success ? (
+        <div className="uf-success">
+          <div className="uf-success-icon" style={{ background: '#f0fdf4', borderColor: '#bbf7d0', color: '#16a34a' }}>
+            <KeyRound size={22} />
+          </div>
+          <p className="uf-success-title">¡Contraseña actualizada!</p>
+          <p className="uf-success-sub">La nueva contraseña de {user?.full_name} ha sido guardada.</p>
+        </div>
+      ) : (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <p style={{ fontSize: '.875rem', color: 'var(--fg-muted)' }}>
+            Cambiando contraseña de <strong>{user?.full_name}</strong>
+          </p>
+
+          {/* Nueva contraseña */}
+          <div className="ui-field">
+            <label className="ui-label">Nueva contraseña</label>
+            <div style={{ position: 'relative' }}>
+              <input
+                className="ui-control"
+                type={showPw ? 'text' : 'password'}
+                placeholder="Mínimo 6 caracteres"
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                style={{ paddingRight: 40 }}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPw(s => !s)}
+                style={{
+                  position: 'absolute', right: 10, top: '50%',
+                  transform: 'translateY(-50%)', background: 'none',
+                  border: 'none', cursor: 'pointer', color: 'var(--fg-muted)',
+                  display: 'flex', padding: 4,
+                }}
+              >
+                {showPw ? <EyeOff size={16} /> : <Eye size={16} />}
+              </button>
+            </div>
+          </div>
+
+          {/* Confirmar */}
+          <div className="ui-field">
+            <label className="ui-label">Confirmar contraseña</label>
+            <input
+              className="ui-control"
+              type={showPw ? 'text' : 'password'}
+              placeholder="Repite la contraseña"
+              value={confirm}
+              onChange={e => setConfirm(e.target.value)}
+            />
+          </div>
+
+          {/* Indicador fortaleza */}
+          {password && (
+            <div className="pw-strength-wrap">
+              <div className={`pw-strength-bar ${
+                password.length >= 12 ? 'strong' : password.length >= 8 ? 'medium' : 'weak'
+              }`} />
+              <span className="pw-strength-label">
+                {password.length >= 12 ? 'Fuerte' : password.length >= 8 ? 'Media' : 'Débil'}
+              </span>
+            </div>
+          )}
+
+          {error && <div className="uf-error-box">{error}</div>}
+
+          <div className="uf-actions">
+            <Button variant="secondary" onClick={() => { onClose(); reset(); }}>Cancelar</Button>
+            <Button onClick={handleSave} loading={loading} icon={<KeyRound size={14} />}>
+              Guardar contraseña
+            </Button>
+          </div>
+        </div>
+      )}
+    </Modal>
+  );
+}
+
 // ── Page ─────────────────────────────────────────────────────
 export default function UsersPage() {
-  const [users, setUsers]         = useState<Profile[]>([]);
-  const [loading, setLoading]     = useState(true);
-  const [inviteOpen, setInvite]   = useState(false);
-  const [editUser, setEditUser]   = useState<Profile | null>(null);
-  const [search, setSearch]       = useState('');
+  const [users, setUsers]           = useState<Profile[]>([]);
+  const [loading, setLoading]       = useState(true);
+  const [inviteOpen, setInvite]     = useState(false);
+  const [editUser, setEditUser]     = useState<Profile | null>(null);
+  const [pwUser, setPwUser]         = useState<Profile | null>(null);
+  const [search, setSearch]         = useState('');
 
   const load = async () => {
     setLoading(true);
@@ -282,7 +421,7 @@ export default function UsersPage() {
           <table className="users-table">
             <thead>
               <tr>
-                {['Usuario', 'Rol', 'Estado', 'Se unió', 'Acciones'].map(h => (
+                {['Usuario', 'Rol', 'Comisión', 'Estado', 'Se unió', 'Acciones'].map(h => (
                   <th key={h}>{h}</th>
                 ))}
               </tr>
@@ -315,6 +454,17 @@ export default function UsersPage() {
                     </select>
                   </td>
 
+                  {/* Comisión */}
+                  <td>
+                    {user.role === 'seller' ? (
+                      <span className="commission-badge">
+                        {(user.commission_pct ?? 0).toFixed(1)}%
+                      </span>
+                    ) : (
+                      <span style={{ color: '#d1d5db', fontSize: '.8rem' }}>—</span>
+                    )}
+                  </td>
+
                   {/* Estado */}
                   <td>
                     <Badge color={user.is_active ? 'green' : 'red'}>
@@ -339,6 +489,14 @@ export default function UsersPage() {
                         Editar
                       </button>
                       <button
+                        className="user-pw-btn"
+                        onClick={() => setPwUser(user)}
+                        title="Cambiar contraseña"
+                      >
+                        <KeyRound size={13} />
+                        Clave
+                      </button>
+                      <button
                         className={`toggle-btn ${user.is_active ? 'deactivate' : 'activate'}`}
                         onClick={() => toggleActive(user)}
                       >
@@ -360,6 +518,11 @@ export default function UsersPage() {
         open={!!editUser}
         onClose={() => setEditUser(null)}
         onDone={load}
+      />
+      <ChangePasswordModal
+        user={pwUser}
+        open={!!pwUser}
+        onClose={() => setPwUser(null)}
       />
     </div>
   );

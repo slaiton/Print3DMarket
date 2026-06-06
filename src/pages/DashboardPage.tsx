@@ -1,7 +1,7 @@
 // src/pages/DashboardPage.tsx
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Package, ShoppingCart, DollarSign, Users, TrendingUp, ArrowRight, Clock } from 'lucide-react';
+import { Package, ShoppingCart, DollarSign, Users, TrendingUp, ArrowRight, Clock, Percent } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuthStore } from '../store/useAuthStore';
 import { Badge } from '../components/ui';
@@ -23,19 +23,24 @@ const STATUS_COLOR: Record<SaleStatus, 'gray' | 'blue' | 'amber' | 'purple' | 'g
 export default function DashboardPage() {
   const { profile } = useAuthStore();
   const isAdmin = profile?.role === 'admin';
-  const [stats, setStats] = useState<Record<string, number>>({});
-  const [recentSales, setRecentSales] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [stats, setStats]               = useState<Record<string, number>>({});
+  const [recentSales, setRecentSales]   = useState<any[]>([]);
+  const [commissions, setCommissions]   = useState<any[]>([]);
+  const [loading, setLoading]           = useState(true);
 
   useEffect(() => {
     async function load() {
       setLoading(true);
       try {
         if (isAdmin) {
-          const { data } = await supabase.rpc('get_dashboard_stats');
-          if (data) setStats(data);
+          const [{ data: s }, { data: c }] = await Promise.all([
+            supabase.rpc('get_dashboard_stats'),
+            supabase.rpc('get_seller_commissions'),
+          ]);
+          if (s) setStats(s);
+          if (c) setCommissions(c);
         } else if (profile?.id) {
-          const { data } = await supabase.rpc('get_seller_stats', { p_seller_id: profile.id });
+          const { data } = await supabase.rpc('get_seller_stats', { seller_id: profile.id });
           if (data) setStats(data);
         }
 
@@ -218,6 +223,24 @@ export default function DashboardPage() {
           {stats.pending_sales ?? 0} pendientes
         </div>
       </div>
+
+      <div className="stat-box stat-box--accent">
+        <div className="stat-icon accent">
+          <Percent size={22} />
+        </div>
+
+        <div className="stat-label">
+          Mi Comisión
+        </div>
+
+        <div className="stat-value">
+          {fmt(stats.my_commission ?? 0)}
+        </div>
+
+        <div className="stat-sub">
+          {(stats.commission_pct ?? 0).toFixed(1)}% sobre ventas
+        </div>
+      </div>
     </>
   )}
 
@@ -267,12 +290,17 @@ export default function DashboardPage() {
               <h2>Acciones rápidas</h2>
             </div>
             <div className="quick-grid">
-              {[
-                { to: '/products', label: 'Nuevo producto', icon: Package,      color: 'quick-blue'   },
-                { to: '/sales',    label: 'Registrar venta', icon: ShoppingCart, color: 'quick-green'  },
-                { to: '/products', label: 'Ver productos',   icon: Package,      color: 'quick-purple' },
-                { to: '/sales',    label: 'Ver ventas',      icon: TrendingUp,   color: 'quick-orange' },
-              ].map(item => (
+              {(isAdmin ? [
+                { to: '/products', label: 'Nuevo producto',   icon: Package,      color: 'quick-blue'   },
+                { to: '/sales',    label: 'Registrar venta',  icon: ShoppingCart, color: 'quick-green'  },
+                { to: '/products', label: 'Ver productos',    icon: Package,      color: 'quick-purple' },
+                { to: '/sales',    label: 'Ver ventas',       icon: TrendingUp,   color: 'quick-orange' },
+              ] : [
+                { to: '/sales',    label: 'Registrar venta',  icon: ShoppingCart, color: 'quick-green'  },
+                { to: '/sales',    label: 'Ver ventas',       icon: TrendingUp,   color: 'quick-orange' },
+                { to: '/catalog',  label: 'Ver catálogo',     icon: Package,      color: 'quick-blue'   },
+                { to: '/dashboard',label: 'Mi comisión',      icon: Percent,      color: 'quick-purple' },
+              ]).map(item => (
                 <Link key={item.label} to={item.to} className="quick-action">
                   <div className={`quick-icon ${item.color}`}>
                     <item.icon size={20} />
@@ -283,6 +311,55 @@ export default function DashboardPage() {
             </div>
           </div>
         </div>
+
+        {/* Tabla de comisiones — solo admin */}
+        {isAdmin && !loading && commissions.length > 0 && (
+          <div className="commission-card">
+            <div className="commission-header">
+              <h2 className="commission-title">
+                <Percent size={16} />
+                Comisiones por vendedor
+              </h2>
+            </div>
+            <div className="commission-table-wrap">
+              <table className="commission-table">
+                <thead>
+                  <tr>
+                    <th>Vendedor</th>
+                    <th>% Comisión</th>
+                    <th>Ventas acumuladas</th>
+                    <th>Comisión a pagar</th>
+                    <th>Estado</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {commissions.map((row: any) => (
+                    <tr key={row.id}>
+                      <td>
+                        <div className="comm-seller">
+                          <div className="comm-avatar">
+                            {row.full_name?.charAt(0).toUpperCase()}
+                          </div>
+                          {row.full_name}
+                        </div>
+                      </td>
+                      <td>
+                        <span className="comm-pct">{Number(row.commission_pct).toFixed(1)}%</span>
+                      </td>
+                      <td className="comm-amount">{fmt(row.revenue ?? 0)}</td>
+                      <td className="comm-total">{fmt(row.commission ?? 0)}</td>
+                      <td>
+                        <span className={`comm-status ${row.is_active ? 'active' : 'inactive'}`}>
+                          {row.is_active ? 'Activo' : 'Inactivo'}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

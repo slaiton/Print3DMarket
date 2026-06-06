@@ -249,6 +249,19 @@
   border-color: #7c3aed;
 }
 
+/* Commission badge */
+.commission-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 99px;
+  font-size: .78rem;
+  font-weight: 600;
+  background: #fff4ed;
+  color: var(--accent);
+  border: 1px solid rgba(232,93,4,.2);
+}
+
 /* Actions cell */
 .user-actions {
   display: flex;
@@ -277,6 +290,51 @@
   background: #fff4ed;
   border-color: var(--accent);
   color: var(--accent);
+}
+
+/* Change password button */
+.user-pw-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  font-size: .8rem;
+  font-weight: 500;
+  border-radius: 8px;
+  border: 1px solid #ddd6fe;
+  color: #7c3aed;
+  background: transparent;
+  cursor: pointer;
+  transition: all .15s;
+}
+
+.user-pw-btn:hover {
+  background: #f5f3ff;
+  border-color: #7c3aed;
+}
+
+/* Password strength indicator */
+.pw-strength-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.pw-strength-bar {
+  flex: 1;
+  height: 4px;
+  border-radius: 99px;
+  transition: background .2s;
+}
+
+.pw-strength-bar.weak   { background: #ef4444; }
+.pw-strength-bar.medium { background: #f59e0b; }
+.pw-strength-bar.strong { background: #16a34a; }
+
+.pw-strength-label {
+  font-size: .72rem;
+  color: var(--fg-muted);
+  white-space: nowrap;
 }
 
 /* toggle button */

@@ -201,6 +201,126 @@
   color: #fb923c;
 }
 
+.stat-icon.accent {
+  background: linear-gradient(
+    135deg,
+    rgba(232,93,4,.25),
+    rgba(232,93,4,.1)
+  );
+  color: #e85d04;
+}
+
+.stat-box--accent {
+  border-top: 3px solid rgba(232,93,4,.5);
+}
+
+/* ── Commission table ─────────────────────────────────────── */
+
+.commission-card {
+  margin-top: 24px;
+  background: rgba(255,255,255,.06);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.commission-header {
+  padding: 18px 24px;
+  border-bottom: 1px solid rgba(255,255,255,.08);
+}
+
+.commission-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: .95rem;
+  font-weight: 700;
+  color: rgba(255,255,255,.9);
+}
+
+.commission-table-wrap { overflow-x: auto; }
+
+.commission-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.commission-table th {
+  padding: 12px 20px;
+  text-align: left;
+  font-size: .72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: rgba(255,255,255,.4);
+  background: rgba(255,255,255,.03);
+  border-bottom: 1px solid rgba(255,255,255,.06);
+}
+
+.commission-table td {
+  padding: 14px 20px;
+  border-bottom: 1px solid rgba(255,255,255,.05);
+  font-size: .875rem;
+  color: rgba(255,255,255,.8);
+}
+
+.commission-table tr:last-child td { border-bottom: none; }
+.commission-table tr:hover td { background: rgba(255,255,255,.03); }
+
+.comm-seller {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 500;
+  color: white;
+}
+
+.comm-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(232,93,4,.4), rgba(232,93,4,.15));
+  border: 1px solid rgba(232,93,4,.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: .75rem;
+  font-weight: 700;
+  color: #fb923c;
+  flex-shrink: 0;
+}
+
+.comm-pct {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 99px;
+  font-size: .78rem;
+  font-weight: 600;
+  background: rgba(232,93,4,.15);
+  color: #fb923c;
+  border: 1px solid rgba(232,93,4,.25);
+}
+
+.comm-amount { color: rgba(255,255,255,.6); }
+
+.comm-total {
+  font-weight: 700;
+  color: #34d399;
+}
+
+.comm-status {
+  display: inline-flex;
+  padding: 3px 10px;
+  border-radius: 99px;
+  font-size: .72rem;
+  font-weight: 600;
+}
+
+.comm-status.active   { background: rgba(52,211,153,.15); color: #34d399; }
+.comm-status.inactive { background: rgba(239,68,68,.12);  color: #f87171; }
+
 .content-grid {
   display: grid;
   grid-template-columns: 2fr 1fr;
