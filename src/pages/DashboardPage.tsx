@@ -251,7 +251,7 @@ export default function DashboardPage() {
         <div className="content-grid">
           {/* Recent sales */}
           <div className="glass-card">
-            <div className="card-title">
+            <div className="dash-card-title">
               <h2 style={{ display:'flex', alignItems:'center', gap:8 }}>
                 <Clock size={16} style={{ opacity:.7 }} /> Ventas recientes
               </h2>
@@ -286,7 +286,7 @@ export default function DashboardPage() {
 
           {/* Quick actions */}
           <div className="glass-card">
-            <div className="card-title">
+            <div className="dash-card-title">
               <h2>Acciones rápidas</h2>
             </div>
             <div className="quick-grid">

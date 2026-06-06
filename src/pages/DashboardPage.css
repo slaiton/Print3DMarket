@@ -339,7 +339,7 @@
   padding: 24px;
 }
 
-.card-title {
+.dash-card-title {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -349,7 +349,7 @@
   margin-bottom: 20px;
 }
 
-.card-title h2 {
+.dash-card-title h2 {
   font-size: 1.1rem;
   font-weight: 700;
 }
