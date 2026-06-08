@@ -1,0 +1,206 @@
+/* ============================================================
+   Global Button System — Print3DMarket
+   Aplica a todos los módulos sin necesidad de estilos por página
+   ============================================================ */
+
+/* ── Base ────────────────────────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  font-family: inherit;
+  font-weight: 600;
+  font-size: .875rem;
+  line-height: 1;
+  white-space: nowrap;
+  text-decoration: none;
+  cursor: pointer;
+
+  border: 1.5px solid transparent;
+  border-radius: 10px;
+  padding: 9px 18px;
+
+  transition:
+    background-color .15s,
+    border-color     .15s,
+    color            .15s,
+    box-shadow       .15s,
+    transform        .1s;
+
+  outline: none;
+  user-select: none;
+}
+
+.btn:focus-visible {
+  box-shadow: 0 0 0 3px rgba(232, 93, 4, .25);
+}
+
+.btn:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.btn:disabled,
+.btn[aria-disabled="true"] {
+  opacity: .5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* ── Variantes ───────────────────────────────────────────────── */
+
+/* Primary — naranja / acción principal */
+.btn-primary {
+  background: var(--accent, #e85d04);
+  border-color: var(--accent, #e85d04);
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(232, 93, 4, .25);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--accent-dark, #cc5200);
+  border-color: var(--accent-dark, #cc5200);
+  box-shadow: 0 4px 14px rgba(232, 93, 4, .35);
+}
+
+/* Secondary — neutro, acciones de cancelar / secundarias */
+.btn-secondary {
+  background: #ffffff;
+  border-color: #e5e7eb;
+  color: #374151;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: #f9fafb;
+  border-color: #d1d5db;
+  color: #111827;
+}
+
+/* Danger — eliminar / acciones destructivas */
+.btn-danger {
+  background: #ef4444;
+  border-color: #ef4444;
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, .2);
+}
+
+.btn-danger:hover:not(:disabled) {
+  background: #dc2626;
+  border-color: #dc2626;
+  box-shadow: 0 4px 14px rgba(239, 68, 68, .3);
+}
+
+/* Ghost — transparente, para acciones sutiles */
+.btn-ghost {
+  background: transparent;
+  border-color: transparent;
+  color: #6b7280;
+}
+
+.btn-ghost:hover:not(:disabled) {
+  background: #f3f4f6;
+  color: #111827;
+}
+
+/* Success — verde, para confirmaciones */
+.btn-success {
+  background: #16a34a;
+  border-color: #16a34a;
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(22, 163, 74, .2);
+}
+
+.btn-success:hover:not(:disabled) {
+  background: #15803d;
+  border-color: #15803d;
+  box-shadow: 0 4px 14px rgba(22, 163, 74, .3);
+}
+
+/* Outline primary — borde naranja, texto naranja */
+.btn-outline {
+  background: transparent;
+  border-color: var(--accent, #e85d04);
+  color: var(--accent, #e85d04);
+}
+
+.btn-outline:hover:not(:disabled) {
+  background: rgba(232, 93, 4, .06);
+}
+
+/* ── Tamaños ─────────────────────────────────────────────────── */
+
+.btn-sm {
+  font-size: .8rem;
+  padding: 6px 13px;
+  gap: 6px;
+  border-radius: 8px;
+}
+
+.btn-md {
+  /* default — ya está en .btn */
+}
+
+.btn-lg {
+  font-size: 1rem;
+  padding: 12px 24px;
+  gap: 10px;
+  border-radius: 12px;
+}
+
+/* ── Icono cuadrado ──────────────────────────────────────────── */
+.btn-icon {
+  padding: 7px;
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  gap: 0;
+}
+
+.btn-icon.btn-sm {
+  width: 28px;
+  height: 28px;
+  padding: 5px;
+}
+
+.btn-icon.btn-lg {
+  width: 42px;
+  height: 42px;
+  padding: 10px;
+}
+
+/* ── Loading spinner interno ─────────────────────────────────── */
+.btn-spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: btn-spin .6s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes btn-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Ancho completo ──────────────────────────────────────────── */
+.btn-block {
+  width: 100%;
+}
+
+/* ── Grupo de botones ────────────────────────────────────────── */
+.btn-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-group-end {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  padding-top: 16px;
+  border-top: 1px solid #f3f4f6;
+}

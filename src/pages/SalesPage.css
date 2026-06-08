@@ -354,18 +354,26 @@
   50%       { opacity: .5; }
 }
 
-/* ── Modal: New Sale Form ───────────────────────────────────── */
+/* ── Modal form wrapper ─────────────────────────────────────── */
+
+.sf-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ── Section labels ─────────────────────────────────────────── */
 
 .sf-section-label {
-  font-size: .75rem;
+  font-size: .72rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: .06em;
+  letter-spacing: .07em;
   color: var(--fg-muted);
-  margin-bottom: 10px;
   display: flex;
   align-items: center;
   gap: 8px;
+  margin-bottom: 2px;
 }
 
 .sf-section-label::after {
@@ -375,40 +383,120 @@
   background: var(--border);
 }
 
+/* ── Cliente grid ───────────────────────────────────────────── */
+
 .sf-grid-2 {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 14px;
+  gap: 12px;
 }
 
-/* Item row */
-.sf-item-row {
-  display: grid;
+/* ── Items section header ───────────────────────────────────── */
+
+.sf-items-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: -4px;
+}
+
+/* ── Lista de items ─────────────────────────────────────────── */
+
+.sf-items-list {
+  display: flex;
+  flex-direction: column;
   gap: 10px;
+}
+
+/* ── Tarjeta de item — mobile-first ─────────────────────────── */
+
+.sf-item-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
   padding: 14px;
   background: var(--bg);
   border-radius: 12px;
-  border: 1px solid var(--border);
-  grid-template-columns: 1fr 90px 70px 32px;
-  align-items: start;
-  transition: border-color .15s;
+  border: 1.5px solid var(--border);
+  transition: border-color .2s, box-shadow .2s;
 }
 
-.sf-item-row:focus-within {
-  border-color: rgba(232, 93, 4, .3);
+.sf-item-card:focus-within {
+  border-color: rgba(232, 93, 4, .4);
+  box-shadow: 0 0 0 3px rgba(232, 93, 4, .07);
 }
 
-.sf-item-col {
+/* Fila superior: selector + botón eliminar */
+.sf-item-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.sf-item-top > :first-child {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Botón eliminar */
+.sf-item-remove {
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  border: 1.5px solid #fecaca;
+  background: #fff5f5;
+  cursor: pointer;
+  color: #f87171;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all .15s;
+  margin-top: 1px;
+}
+
+.sf-item-remove:hover {
+  background: #fef2f2;
+  border-color: #ef4444;
+  color: #ef4444;
+}
+
+/* Fila de precios: precio | cantidad | subtotal */
+.sf-item-amounts {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 8px;
+  align-items: end;
+}
+
+.sf-item-amount-col {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
 }
 
-/* Inputs within the sale form — same look as the ui/Input component */
+.sf-item-amount-label {
+  font-size: .7rem;
+  font-weight: 600;
+  color: var(--fg-muted);
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+
+/* Subtotal calculado */
+.sf-item-subtotal {
+  font-size: .875rem;
+  font-weight: 700;
+  color: var(--accent);
+  white-space: nowrap;
+  padding-bottom: 9px;  /* alinea con el input */
+}
+
+/* Inputs dentro del formulario */
 .sf-item-input {
   width: 100%;
-  padding: 8px 12px;
-  font-size: .82rem;
+  padding: 9px 12px;
+  font-size: .875rem;
   border: 1.5px solid var(--border);
   border-radius: 8px;
   background: var(--surface);
@@ -416,6 +504,7 @@
   outline: none;
   transition: border-color .15s, box-shadow .15s;
   font-family: inherit;
+  line-height: 1.4;
 }
 
 .sf-item-input:focus {
@@ -423,43 +512,34 @@
   box-shadow: 0 0 0 3px rgba(232, 93, 4, .08);
 }
 
-.sf-item-input::placeholder { color: var(--fg-muted); }
+.sf-item-input::placeholder { color: var(--fg-muted); opacity: .8; }
 
-.sf-item-remove {
-  width: 30px;
-  height: 30px;
-  border-radius: 8px;
-  border: 1.5px solid transparent;
-  background: transparent;
-  cursor: pointer;
-  color: #9ca3af;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all .15s;
-  margin-top: 2px;
+/* Personalización — estilo sutil */
+.sf-item-custom {
+  background: #fafafa;
+  font-size: .82rem;
+  color: var(--fg-muted);
 }
 
-.sf-item-remove:hover {
-  background: #fef2f2;
-  border-color: #fecaca;
-  color: #ef4444;
-}
+.sf-item-custom:focus { color: var(--fg); }
+
+/* ── Botón agregar línea ─────────────────────────────────────── */
 
 .sf-add-line {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-size: .8rem;
+  font-size: .82rem;
   font-weight: 600;
   color: var(--accent);
   background: rgba(232, 93, 4, .06);
-  border: 1.5px dashed rgba(232, 93, 4, .35);
+  border: 1.5px dashed rgba(232, 93, 4, .4);
   border-radius: 8px;
   cursor: pointer;
-  padding: 5px 12px;
+  padding: 7px 14px;
   transition: all .15s;
   font-family: inherit;
+  white-space: nowrap;
 }
 
 .sf-add-line:hover {
@@ -467,27 +547,31 @@
   border-color: var(--accent);
 }
 
+/* ── Total ──────────────────────────────────────────────────── */
+
 .sf-total-box {
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  gap: 10px;
-  padding: 12px 16px;
-  background: rgba(232, 93, 4, .06);
-  border: 1.5px solid rgba(232, 93, 4, .2);
-  border-radius: 10px;
+  gap: 12px;
+  padding: 14px 18px;
+  background: rgba(232, 93, 4, .05);
+  border: 1.5px solid rgba(232, 93, 4, .18);
+  border-radius: 12px;
 }
 
 .sf-total-label {
-  font-size: .8rem;
+  font-size: .85rem;
   color: var(--fg-muted);
 }
 
 .sf-total-value {
-  font-size: 1.15rem;
+  font-size: 1.25rem;
   font-weight: 800;
   color: var(--fg);
 }
+
+/* ── Acciones del modal ─────────────────────────────────────── */
 
 .sf-actions {
   display: flex;
@@ -500,9 +584,61 @@
 /* ── Responsive ─────────────────────────────────────────────── */
 
 @media (max-width: 768px) {
-  .sales-page    { padding: 18px; }
-  .sales-header  { flex-direction: column; align-items: flex-start; gap: 16px; }
-  .sales-search  { max-width: 100%; }
-  .sf-grid-2     { grid-template-columns: 1fr; }
-  .sf-item-row   { grid-template-columns: 1fr 80px 56px 32px; }
+  .sales-page   { padding: 16px; }
+  .sales-header { flex-direction: column; align-items: flex-start; gap: 14px; }
+  .sales-search { max-width: 100%; }
+
+  /* Cliente en columna en mobile */
+  .sf-grid-2 { grid-template-columns: 1fr; }
+
+  /* Item card más compacta pero cómoda */
+  .sf-item-card { padding: 12px; }
+
+  /* Precio y cantidad apilados si no caben */
+  .sf-item-amounts {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto;
+  }
+
+  /* Subtotal baja a segunda fila, ocupa ambas columnas */
+  .sf-item-subtotal {
+    grid-column: 1 / -1;
+    text-align: right;
+    padding-bottom: 0;
+    padding-top: 2px;
+    font-size: .8rem;
+  }
+
+  /* Acciones full width en mobile */
+  .sf-actions {
+    flex-direction: column-reverse;
+    gap: 8px;
+  }
+
+  .sf-actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Total más legible */
+  .sf-total-box {
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 2px;
+    padding: 12px 14px;
+  }
+
+  .sf-total-value { font-size: 1.4rem; }
+}
+
+@media (max-width: 400px) {
+  /* Pantallas muy pequeñas: precio y cantidad en columna */
+  .sf-item-amounts {
+    grid-template-columns: 1fr;
+  }
+
+  .sf-item-subtotal {
+    grid-column: 1;
+    font-size: .875rem;
+  }
 }

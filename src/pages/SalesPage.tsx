@@ -186,7 +186,7 @@ function EditSaleModal({ open, onClose, sale, sellers, onSaved }: {
 
   return (
     <Modal open={open} onClose={onClose} title="Editar venta" size="md">
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+      <form onSubmit={handleSubmit} className="sf-form">
         <Select
           label="Vendedor responsable"
           value={sellerId}
@@ -320,7 +320,7 @@ function NewSaleModal({ open, onClose, onSaved, sellers }: {
 
   return (
     <Modal open={open} onClose={onClose} title="Registrar venta" size="lg">
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+      <form onSubmit={handleSubmit} className="sf-form">
 
         {/* ── Vendedor ── */}
         <p className="sf-section-label">Vendedor responsable</p>
@@ -349,53 +349,75 @@ function NewSaleModal({ open, onClose, onSaved, sellers }: {
           </button>
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+        <div className="sf-items-list">
           {items.map((item, i) => (
-            <div key={i} className="sf-item-row">
-              <div className="sf-item-col">
+            <div key={i} className="sf-item-card">
+
+              {/* Fila 1: selector de producto + botón eliminar */}
+              <div className="sf-item-top">
                 <Select
                   value={item.product_id}
                   onChange={e => selectProduct(i, e.target.value)}
                   options={productOptions}
                   placeholder="Seleccionar producto"
                 />
-                {!item.product_id && (
-                  <input
-                    className="sf-item-input"
-                    value={item.product_name}
-                    onChange={e => setItem(i, 'product_name', e.target.value)}
-                    placeholder="Nombre del producto"
-                  />
+                {items.length > 1 && (
+                  <button
+                    type="button"
+                    className="sf-item-remove"
+                    onClick={() => removeItem(i)}
+                    aria-label="Eliminar línea"
+                  >
+                    <Trash2 size={14}/>
+                  </button>
                 )}
+              </div>
+
+              {/* Nombre libre si no hay producto seleccionado */}
+              {!item.product_id && (
                 <input
                   className="sf-item-input"
-                  value={item.customization}
-                  onChange={e => setItem(i, 'customization', e.target.value)}
-                  placeholder="Personalización (opcional)"
+                  value={item.product_name}
+                  onChange={e => setItem(i, 'product_name', e.target.value)}
+                  placeholder="Nombre del producto"
                 />
+              )}
+
+              {/* Fila 2: precio + cantidad (side by side siempre) */}
+              <div className="sf-item-amounts">
+                <div className="sf-item-amount-col">
+                  <span className="sf-item-amount-label">Precio</span>
+                  <input
+                    type="number"
+                    className="sf-item-input"
+                    value={item.unit_price || ''}
+                    onChange={e => setItem(i, 'unit_price', Number(e.target.value))}
+                    placeholder="0"
+                  />
+                </div>
+                <div className="sf-item-amount-col">
+                  <span className="sf-item-amount-label">Cantidad</span>
+                  <input
+                    type="number"
+                    min={1}
+                    className="sf-item-input"
+                    value={item.quantity}
+                    onChange={e => setItem(i, 'quantity', Number(e.target.value))}
+                  />
+                </div>
+                <div className="sf-item-subtotal">
+                  $ {((item.unit_price || 0) * item.quantity).toLocaleString('es-CO')}
+                </div>
               </div>
+
+              {/* Personalización */}
               <input
-                type="number"
-                className="sf-item-input"
-                value={item.unit_price || ''}
-                onChange={e => setItem(i, 'unit_price', Number(e.target.value))}
-                placeholder="Precio"
+                className="sf-item-input sf-item-custom"
+                value={item.customization}
+                onChange={e => setItem(i, 'customization', e.target.value)}
+                placeholder="Personalización / nota (opcional)"
               />
-              <input
-                type="number"
-                min={1}
-                className="sf-item-input"
-                value={item.quantity}
-                onChange={e => setItem(i, 'quantity', Number(e.target.value))}
-              />
-              <button
-                type="button"
-                className="sf-item-remove"
-                onClick={() => removeItem(i)}
-                style={{ visibility: items.length > 1 ? 'visible' : 'hidden' }}
-              >
-                <Trash2 size={14}/>
-              </button>
+
             </div>
           ))}
         </div>

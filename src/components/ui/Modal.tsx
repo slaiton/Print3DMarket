@@ -1,22 +1,34 @@
-import { ReactNode } from 'react';
+import { ReactNode, useEffect } from 'react';
 import { X } from 'lucide-react';
 import './Modal.css';
 
 interface ModalProps {
-  open: boolean;
-  onClose: () => void;
-  title: string;
+  open:     boolean;
+  onClose:  () => void;
+  title:    string;
   children: ReactNode;
-  size?: 'sm' | 'md' | 'lg';
+  size?:    'sm' | 'md' | 'lg';
 }
 
-const maxWidths = { sm: '400px', md: '560px', lg: '720px' };
-
 export function Modal({ open, onClose, title, children, size = 'md' }: ModalProps) {
+  // Bloquea el scroll del body cuando el modal está abierto
+  useEffect(() => {
+    if (open) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => { document.body.style.overflow = ''; };
+  }, [open]);
+
   if (!open) return null;
+
   return (
-    <div className="modal-backdrop" onClick={e => { if (e.target === e.currentTarget) onClose(); }}>
-      <div className="modal-box" style={{ maxWidth: maxWidths[size] }}>
+    <div
+      className="modal-backdrop"
+      onClick={e => { if (e.target === e.currentTarget) onClose(); }}
+    >
+      <div className={`modal-box modal-box--${size}`}>
         <div className="modal-header">
           <h3 className="modal-title">{title}</h3>
           <button
