@@ -1,0 +1,108 @@
+/* ── Ocultar cursor nativo SOLO en la página del catálogo ────── */
+.catalog-root,
+.catalog-root * {
+  cursor: none !important;
+}
+
+/* ── Contenedor ─────────────────────────────────────────────── */
+.cursor-root {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* ── Punto central ──────────────────────────────────────────── */
+.cursor-dot {
+  position: absolute;
+  top: -5px;
+  left: -5px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #e85d04;
+  box-shadow:
+    0 0 8px  rgba(232, 93, 4, 0.9),
+    0 0 20px rgba(232, 93, 4, 0.5);
+  transition: width .1s, height .1s, background .2s;
+  will-change: transform;
+}
+
+.cursor-dot.cursor-click {
+  width: 6px;
+  height: 6px;
+  background: #fff;
+  box-shadow: 0 0 16px rgba(255,255,255,0.9);
+}
+
+/* ── Anillo exterior ─────────────────────────────────────────── */
+.cursor-ring {
+  position: absolute;
+  top: -20px;
+  left: -20px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(232, 93, 4, 0.65);
+  box-shadow:
+    0 0 10px rgba(232, 93, 4, 0.25),
+    inset 0 0 6px rgba(232, 93, 4, 0.1);
+  transition:
+    width .25s cubic-bezier(.25,.46,.45,.94),
+    height .25s cubic-bezier(.25,.46,.45,.94),
+    top .25s, left .25s,
+    border-color .25s,
+    box-shadow .25s;
+  will-change: transform;
+}
+
+/* Hover sobre elementos interactivos */
+.cursor-ring.cursor-hover {
+  top: -28px;
+  left: -28px;
+  width: 56px;
+  height: 56px;
+  border-color: rgba(251, 146, 60, 0.8);
+  background: rgba(232, 93, 4, 0.06);
+  box-shadow:
+    0 0 20px rgba(232, 93, 4, 0.35),
+    inset 0 0 12px rgba(232, 93, 4, 0.08);
+}
+
+/* Click */
+.cursor-ring.cursor-click {
+  top: -14px;
+  left: -14px;
+  width: 28px;
+  height: 28px;
+  border-color: #fff;
+  box-shadow: 0 0 20px rgba(255,255,255,0.5);
+}
+
+/* ── Trail de partículas ─────────────────────────────────────── */
+.cursor-trail {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fb923c 0%, #e85d04 50%, transparent 100%);
+  transform-origin: center;
+  top: 0;
+  left: 0;
+  margin-top: calc(var(--s, 8px) / -2);
+  margin-left: calc(var(--s, 8px) / -2);
+  transition: opacity .4s ease-out;
+  will-change: transform, opacity;
+  filter: blur(1px);
+}
+
+/* ── Reducir efectos si el usuario prefiere menos movimiento ── */
+@media (prefers-reduced-motion: reduce) {
+  .cursor-root { display: none; }
+  .catalog-root, .catalog-root * { cursor: auto !important; }
+}
+
+/* ── No mostrar en touch/mobile ─────────────────────────────── */
+@media (hover: none) and (pointer: coarse) {
+  .cursor-root { display: none; }
+  .catalog-root, .catalog-root * { cursor: auto !important; }
+}

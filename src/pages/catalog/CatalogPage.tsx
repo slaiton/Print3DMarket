@@ -9,6 +9,8 @@ import { productService } from '../../services/productService';
 import type { Product } from '../../types';
 import { SEOHead } from '../../seo/SEOHead';
 import { PAGE_META, JSONLD_ORGANIZATION, SITE } from '../../seo/seo.config';
+import { HeroCanvas } from '../../components/effects/HeroCanvas';
+import { CursorEffect } from '../../components/effects/CursorEffect';
 import './CatalogPage.css';
 
 // ── WhatsApp helper ───────────────────────────────────────────
@@ -371,12 +373,8 @@ function HeroBanner() {
 
   return (
     <header className="hero-banner" role="banner">
-      {/* Fondo decorativo */}
-      <div className="hero-bg-shapes" aria-hidden="true">
-        <span className="hero-shape s1">◈</span>
-        <span className="hero-shape s2">◈</span>
-        <span className="hero-shape s3">◈</span>
-      </div>
+      {/* Canvas 3D animado */}
+      <HeroCanvas />
 
       <div className="hero-content">
         <div className="hero-text">
@@ -394,7 +392,7 @@ function HeroBanner() {
           {/* Descripción — meta description visible */}
           <p className="hero-desc">
             Impresiones 3D personalizadas a la medida — figuras, accesorios,
-            decoración y regalos en PLA, PETG y resina. Envíos a todo Colombia.
+            decoración y regalos. Envíos a todo Colombia.
           </p>
 
           {/* CTA */}
@@ -463,6 +461,7 @@ export default function CatalogPage() {
 
   return (
     <div className="catalog-root">
+      <CursorEffect />
       <SEOHead
         title={PAGE_META.catalog.title}
         description={PAGE_META.catalog.description}
