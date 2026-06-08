@@ -1,0 +1,13 @@
+User-agent: *
+Allow: /
+Allow: /catalog
+
+# Bloquear rutas privadas del panel
+Disallow: /dashboard
+Disallow: /products
+Disallow: /sales
+Disallow: /maestros/
+Disallow: /login
+Disallow: /reset-password
+
+Sitemap: https://market.slaiton.com/sitemap.xml

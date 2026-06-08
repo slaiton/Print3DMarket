@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
+import { HelmetProvider } from 'react-helmet-async';
 import { useAuthStore } from './store/useAuthStore';
 import { AppShell } from './components/layout/AppShell';
 
@@ -62,6 +63,7 @@ export default function App() {
   useEffect(() => { init(); }, [init]);
 
   return (
+    <HelmetProvider>
     <BrowserRouter>
       <Routes>
         {/* ── Públicas (sin sesión) ─────────────────────── */}
@@ -90,5 +92,6 @@ export default function App() {
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
+    </HelmetProvider>
   );
 }

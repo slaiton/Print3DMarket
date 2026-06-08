@@ -2,11 +2,13 @@ import { useState } from 'react';
 import {
   Search, SlidersHorizontal, X, ChevronDown, Layers, Zap, Tag,
   Clock, Weight, ChevronLeft, ChevronRight, MessageCircle,
-  CheckCircle, AlertCircle, Sparkles
+  CheckCircle, AlertCircle, Sparkles, Package, Palette, Star
 } from 'lucide-react';
 import { useCatalog } from '../../hooks/useCatalog';
 import { productService } from '../../services/productService';
 import type { Product } from '../../types';
+import { SEOHead } from '../../seo/SEOHead';
+import { PAGE_META, JSONLD_ORGANIZATION, SITE } from '../../seo/seo.config';
 import './CatalogPage.css';
 
 // ── WhatsApp helper ───────────────────────────────────────────
@@ -360,23 +362,120 @@ function FilterBar({ catalog }: { catalog: ReturnType<typeof useCatalog> }) {
   );
 }
 
+// ── Hero Banner ───────────────────────────────────────────────
+function HeroBanner() {
+  const wa = (import.meta.env.VITE_WHATSAPP_NUMBER ?? '').replace(/\D/g, '');
+  const waUrl = wa
+    ? `https://wa.me/${wa}?text=${encodeURIComponent('Hola! Quiero cotizar una impresión 3D personalizada.')}`
+    : '#';
+
+  return (
+    <header className="hero-banner" role="banner">
+      {/* Fondo decorativo */}
+      <div className="hero-bg-shapes" aria-hidden="true">
+        <span className="hero-shape s1">◈</span>
+        <span className="hero-shape s2">◈</span>
+        <span className="hero-shape s3">◈</span>
+      </div>
+
+      <div className="hero-content">
+        <div className="hero-text">
+          {/* Eyebrow — keyword rich */}
+          <p className="hero-eyebrow">
+            <Star size={12} /> Impresión 3D en Colombia
+          </p>
+
+          {/* H1 — keyword principal */}
+          <h1 className="hero-title">
+            Regalos únicos &amp; figuras<br />
+            <span className="hero-title-accent">coleccionables en 3D</span>
+          </h1>
+
+          {/* Descripción — meta description visible */}
+          <p className="hero-desc">
+            Impresiones 3D personalizadas a la medida — figuras, accesorios,
+            decoración y regalos en PLA, PETG y resina. Envíos a todo Colombia.
+          </p>
+
+          {/* CTA */}
+          <div className="hero-ctas">
+            <a href="#catalog-grid" className="hero-cta-primary">
+              Ver catálogo
+            </a>
+            <a
+              href={waUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hero-cta-secondary"
+            >
+              💬 Cotizar ahora
+            </a>
+          </div>
+        </div>
+
+        {/* Features — beneficios clave */}
+        <ul className="hero-features" aria-label="Beneficios">
+          <li className="hero-feat">
+            <span className="hero-feat-icon"><Package size={16}/></span>
+            <div>
+              <strong>A la medida</strong>
+              <span>Diseños únicos bajo pedido</span>
+            </div>
+          </li>
+          <li className="hero-feat">
+            <span className="hero-feat-icon"><Palette size={16}/></span>
+            <div>
+              <strong>Múltiples materiales</strong>
+              <span>PLA · PETG · Resina · ABS</span>
+            </div>
+          </li>
+          <li className="hero-feat">
+            <span className="hero-feat-icon"><Star size={16}/></span>
+            <div>
+              <strong>Envíos Colombia</strong>
+              <span>Rápido y seguro a todo el país</span>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </header>
+  );
+}
+
 // ── Page ──────────────────────────────────────────────────────
 export default function CatalogPage() {
   const catalog = useCatalog();
   const { products, loading, error } = catalog;
   const [selected, setSelected] = useState<Product | null>(null);
 
+  // JSON-LD con datos del negocio
+  const jsonLdWebSite = {
+    '@context':  'https://schema.org',
+    '@type':     'WebSite',
+    name:         SITE.name,
+    url:          SITE.url,
+    potentialAction: {
+      '@type':       'SearchAction',
+      target:        `${SITE.url}/?search={search_term_string}`,
+      'query-input': 'required name=search_term_string',
+    },
+  };
+
   return (
     <div className="catalog-root">
-      <header className="catalog-header">
-        <p className="header-label">Catálogo 3D</p>
-        <h1 className="header-title">Impresiones 3D<br />a tu medida</h1>
-        <p className="header-sub">Explora nuestro catálogo. Personaliza, ordena y recibe.</p>
-      </header>
+      <SEOHead
+        title={PAGE_META.catalog.title}
+        description={PAGE_META.catalog.description}
+        keywords={PAGE_META.catalog.keywords}
+        canonical={`${SITE.url}/catalog`}
+        jsonLd={[JSONLD_ORGANIZATION, jsonLdWebSite]}
+      />
+
+      <HeroBanner />
 
       <FilterBar catalog={catalog} />
 
-      <main className="catalog-content">
+      <main className="catalog-content" id="catalog-grid">
         <div className="results-meta">
           <p className="results-count">
             {loading ? 'Cargando...' : (

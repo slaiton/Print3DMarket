@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { Printer, Eye, EyeOff, Layers3, Box, Cuboid, ArrowLeft, Mail, CheckCircle } from 'lucide-react';
 import { useAuthStore } from '../../store/useAuthStore';
 import { supabase } from '../../lib/supabase';
+import { SEOHead } from '../../seo/SEOHead';
+import { PAGE_META } from '../../seo/seo.config';
 import './LoginPage.css';
 
 // ── Vista principal: iniciar sesión ──────────────────────────
@@ -180,6 +182,11 @@ export default function LoginPage() {
 
   return (
     <div className="login-page">
+      <SEOHead
+        title={PAGE_META.login.title}
+        description={PAGE_META.login.description}
+        noIndex={true}
+      />
       <div className="login-background">
         <div className="blob blob-1" />
         <div className="blob blob-2" />
