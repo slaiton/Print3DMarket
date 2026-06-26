@@ -70,11 +70,13 @@ Deno.serve(async (req: Request) => {
     }
 
     // ── 4. Invitar usuario vía Admin Auth API ───────────────
+    // Fallback a producción si la secret SITE_URL no está configurada
+    const siteUrl = Deno.env.get('SITE_URL') ?? 'https://market.slaiton.com';
     const { data, error: inviteErr } = await supabaseAdmin.auth.admin.inviteUserByEmail(
       email,
       {
         data: { full_name, role },
-        redirectTo: `${Deno.env.get('SITE_URL') ?? ''}/login`,
+        redirectTo: `${siteUrl}/login`,
       },
     );
 
